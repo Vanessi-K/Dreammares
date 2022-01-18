@@ -11,7 +11,10 @@ class Barrier extends GameObject {
 
     render() {
         this.ctx.translate(this.x, this.y);
+        this.ctx.fillStyle = "#FFF"
+        this.ctx.fillRect(0,0,this.image.width, this.image.height);
         this.ctx.drawImage(this.image, 0, 0, this.image.width, this.image.height)
+
         this.ctx.resetTransform();
     }
 

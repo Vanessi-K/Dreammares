@@ -11,10 +11,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+
     overflow-x: hidden;
     overflow-y: hidden;
 }
-
 
 #game-area {
     /*set 16:9 aspect ratio based on screen size*/
@@ -22,4 +22,11 @@ body {
     width: calc(100vh/9*16);
     background: url("../assets/background.png") center/cover no-repeat;
 
+}
+
+#bar-area {
+    z-index: 100;
+    position: absolute;
+    left: calc((100vw - (100vh/9*16))/2);
+    top: 0;
 }

@@ -1,0 +1,16 @@
+//1 horizontal barrier
+//2 vertical barrier
+//3 horizontal and vertical barrier
+//4 shadow monster
+//5 jar 2
+//6 jar 4
+//7 jar 6
+
+//top to bottom
+
+{
+
+{0	,	0	,	1	,	2	,
+}
+
+}

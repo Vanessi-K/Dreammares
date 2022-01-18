@@ -1,0 +1,129 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: peachy-keen-jf, sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 3vh;
+    color: white;
+}
+
+
+#start-background, #end-background, #story-background {
+    width: 100vw;
+    height: 100vh;
+    background: url("../assets/start-end/start-background.png") center/cover no-repeat;
+}
+
+h3 {
+    font-size: 5vh;
+    color: #dddd28;
+    margin: 0 0 3vh 0;
+}
+
+p, ul {
+    font-size: 3vh;
+}
+
+.yellow {
+    color: #dddd28;
+}
+
+/*Start*/
+
+#start-background {
+    background-image: url("../assets/start-end/start-background.png");
+}
+
+#start-button-placement {
+    position: fixed;
+    left: 48vw;
+    top: 45vh;
+    display: flex;
+    align-items: center;
+    align-content: space-evenly;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 30vw;
+    height: 35vh;
+}
+
+.container {
+    height: 80vh;
+    width: 80vw;
+    display: flex;
+    border-radius: 50px;
+
+    background: linear-gradient(90deg, rgba(39,4,94,1) 0%, rgba(24,7,58,1) 100%);
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 5vh;
+}
+
+/*End*/
+
+#end-background, #story-background {
+    background-image: url("../assets/background.png");
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#end-container {
+    flex-direction: column;
+}
+
+
+#rating-parameters {
+    display: flex;
+    flex-direction: row;
+    width: 70%;
+    justify-content: space-evenly;
+}
+
+#rating-parameters > * {
+    display: flex;
+    align-items: center;
+}
+
+/*Story and Controls*/
+
+#story-container {
+    flex-direction: column;
+}
+
+.column-div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.column-one {
+    width: 50%;
+}
+.column-two {
+    width: 30%;
+}
+
+/*Button*/
+
+.button {
+    display: block;
+    font-size: 3.5vh;
+    background: linear-gradient(180deg, rgba(130,55,170,1) 0%, rgba(39,4,94,1) 100%);
+    padding: 1vh 2vw;
+    border-radius: 3vh;
+    box-shadow: 21px 21px 26px black;
+    transition: 0.5s;
+    color: #dddd28;
+    text-decoration: none;
+}
+
+.button:hover {
+    font-size: 3.8vh;
+}

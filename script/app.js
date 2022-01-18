@@ -11,8 +11,18 @@ const CONFIG = {
     height: 1080,
     tileSize: 30,
     topOffset: 90,
-    bottomOffset: 30
+    bottomOffset: 30,
+    columnsPerWidth: 64, //1920:30
+    columnOffset: 6,
+    lastColumn: 299
 }
+
+let camera = {
+    firstVisibleColumn: 0,
+    lastVisibleColumn: CONFIG.columnsPerWidth,
+    firstRenderedColumn: 0,
+    lastRenderedColumn: CONFIG.columnsPerWidth + CONFIG.columnOffset
+};
 
 let ctx;
 let lastTickTimestamp;
@@ -42,6 +52,9 @@ function init() {
     gameObjects.push(new Boundary(ctx, 0, CONFIG.height - CONFIG.bottomOffset, CONFIG.width, CONFIG.bottomOffset));
 
     lastTickTimestamp = performance.now();
+
+    console.log(camera);
+
     gameLoop();
 }
 
@@ -57,13 +70,15 @@ function gameLoop() {
 }
 
 function update(timePassedSinceLastRender) {
-    worldObjects.forEach((worldObjectsColumn) => {
-        worldObjectsColumn.forEach((worldObject) => {
+
+    //only update elements in visible area
+    for(let i = camera.firstRenderedColumn; i <= camera.lastRenderedColumn; i++) {
+        worldObjects[i].forEach((worldObject) => {
             if(worldObject !== null) {
                 worldObject.update();
             }
         });
-    });
+    }
 
     gameObjects.forEach((gameObject) => gameObject.update());
 }
@@ -73,13 +88,15 @@ function render() {
     ctx.clearRect(0, 0, CONFIG.width, CONFIG.height);
 
     //draw new frame
-    worldObjects.forEach((worldObjectsColumn) => {
-        worldObjectsColumn.forEach((worldObject) => {
+    //only render elements in visible area
+    for(let i = camera.firstRenderedColumn; i <= camera.lastRenderedColumn; i++) {
+        worldObjects[i].forEach((worldObject) => {
             if(worldObject !== null) {
                 worldObject.render();
             }
         });
-    });
+    }
+
     gameObjects.forEach((gameObject) => gameObject.render());
 }
 
@@ -103,7 +120,6 @@ function createWorld() {
             let x = indexColumn * CONFIG.tileSize;
             let y = indexRow * CONFIG.tileSize + CONFIG.topOffset;
 
-            //console.log(objectMatrixRowItem);
             switch (objectMatrixRowItem) {
                 case 1:
                     newObject = new Barrier(ctx, x, y, "../../assets/barrier-horizontal.png"); break;
@@ -128,6 +144,38 @@ function createWorld() {
             worldObjects[indexColumn][indexRow] = newObject;
         });
     });
+}
+
+//Calculate the boundaries for the camera, which elements are drawn on the canvas
+function setCamera(firstColumn) {
+    let firstVisibleColumnNew;
+    let lastVisibleColumnNew;
+    let firstRenderedColumnNew; //Rendered, but not fully in Viewport
+    let lastRenderedColumnNew;  //Rendered, but not fully in Viewport
+
+    firstVisibleColumnNew = firstColumn;
+    lastVisibleColumnNew = firstVisibleColumnNew + CONFIG.columnOffset;
+    firstRenderedColumnNew = firstVisibleColumnNew - CONFIG.columnOffset;
+    lastRenderedColumnNew = lastVisibleColumnNew + CONFIG.columnOffset;
+
+    if(firstVisibleColumnNew < 0) {
+        firstVisibleColumnNew = 0;
+        firstRenderedColumnNew = 0;
+    } else if(firstVisibleColumnNew < CONFIG.columnOffset) {
+        firstRenderedColumnNew = 0;
+    }
+
+    if (lastVisibleColumnNew > CONFIG.lastColumn - CONFIG.columnOffset) {
+        lastVisibleColumnNew = CONFIG.lastColumn - CONFIG.columnOffset;
+        lastRenderedColumnNew = lastVisibleColumnNew + CONFIG.columnOffset
+    }
+
+    camera = {
+        firstVisibleColumn: firstVisibleColumnNew,
+        lastVisibleColumn: lastVisibleColumnNew,
+        firstRenderedColumn: firstRenderedColumnNew,
+        lastRenderedColumn: lastRenderedColumnNew
+    };
 }
 
 

@@ -64,7 +64,7 @@ class Player extends GameObject {
     render() {
         this.ctx.translate(this.x, this.y);
 
-        //get correct state values
+        //get correct values for the sprite in the current direction
         let coordinates = this.getImageSpriteCoordinates(this.sprites[this.state]);
 
         //draw character and move center to center of image
@@ -84,7 +84,6 @@ class Player extends GameObject {
     }
 
     getImageSpriteCoordinates(sprite) {
-
         //getting the right frame
         let frameX = Math.floor(performance.now() / 1000 * sprite.fps % sprite.frames);
 

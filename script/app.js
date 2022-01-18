@@ -28,30 +28,18 @@ function init() {
     let canvas = document.querySelector("#game-area");
     ctx = canvas.getContext("2d");
 
-    player = new Player(ctx, 200, 750);
-    gameObjects.push(player);
-
     canvas.setAttribute("width", CONFIG.width);
     canvas.setAttribute("height", CONFIG.height);
 
     createWorld();
 
+    //Player
+    player = new Player(ctx, 200, 770);
+    gameObjects.push(player);
+
+    //top and bottom boundary
     gameObjects.push(new Boundary(ctx, 0, 0, CONFIG.width, CONFIG.topOffset));
     gameObjects.push(new Boundary(ctx, 0, CONFIG.height - CONFIG.bottomOffset, CONFIG.width, CONFIG.bottomOffset));
-
-
-    /*gameObjects.push(new Collectable(ctx, 100, 600, "../../assets/full-jar.png"));
-    gameObjects.push(new Collectable(ctx, 800, 200, "../../assets/half-jar.png"));
-    gameObjects.push(new Collectable(ctx, 900, 900, "../../assets/empty-jar.png"));
-
-    gameObjects.push(new Monster(ctx, 1300, 400, "../../assets/shadow-creature.png"));
-
-    gameObjects.push(new Barrier(ctx, 900, 500, "../../assets/barrier-horizontal.png"));
-    gameObjects.push(new Barrier(ctx, 930, 500, "../../assets/barrier-corner.png"));
-    gameObjects.push(new Barrier(ctx, 930, 530, "../../assets/barrier-vertical.png"));
-
-    gameObjects.push(new Portal(ctx, 400, 300, "../../assets/portal.png"));*/
-
 
     lastTickTimestamp = performance.now();
     gameLoop();
@@ -117,31 +105,29 @@ function createWorld() {
 
             //console.log(objectMatrixRowItem);
             switch (objectMatrixRowItem) {
-                case 1: //console.log(1);
-                newObject = new Barrier(ctx, x, y, "../../assets/barrier-horizontal.png"); break;
-                case 2: //console.log(2);
-                newObject = new Barrier(ctx, x, y, "../../assets/barrier-vertical.png");
-                console.log(indexRow + ":" + y); break;
-                case 3: //console.log(3);
-                newObject = new Barrier(ctx, x, y, "../../assets/barrier-corner.png"); break;
-                case 4: //console.log(4);
-                newObject = new Monster(ctx, x, y, "../../assets/shadow-creature.png"); break;
-                case 5: //console.log(5);
-                newObject = new Collectable(ctx, x, y, "../../assets/empty-jar.png"); break;
-                case 6: //console.log(6);
-                newObject = new Collectable(ctx, x, y, "../../assets/half-jar.png"); break;
-                case 7: //console.log(7);
-                newObject = new Collectable(ctx, x, y, "../../assets/full-jar.png"); break;
-                case 8: //console.log(8);
-                newObject = new Portal(ctx, x, y, "../../assets/portal.png"); break;
-                case 9: //console.log(9);
-                newObject = new Portal(ctx, x, y, "../../assets/portal.png"); break;
-                default: //console.log(objectMatrixRowItem);
+                case 1:
+                    newObject = new Barrier(ctx, x, y, "../../assets/barrier-horizontal.png"); break;
+                case 2:
+                    newObject = new Barrier(ctx, x, y, "../../assets/barrier-vertical.png"); break;
+                case 3:
+                    newObject = new Barrier(ctx, x, y, "../../assets/barrier-corner.png"); break;
+                case 4:
+                    newObject = new Monster(ctx, x, y, "../../assets/shadow-creature.png"); break;
+                case 5:
+                    newObject = new Collectable(ctx, x, y, "../../assets/empty-jar.png"); break;
+                case 6:
+                    newObject = new Collectable(ctx, x, y, "../../assets/half-jar.png"); break;
+                case 7:
+                    newObject = new Collectable(ctx, x, y, "../../assets/full-jar.png"); break;
+                case 8:
+                    newObject = new Portal(ctx, x, y, "../../assets/portal.png"); break;
+                case 9:
+                    newObject = new Portal(ctx, x, y, "../../assets/portal.png"); break;
             }
 
-            worldObjects[indexColumn][objectMatrixRowItem] = newObject;
-            newObject = null;
+            worldObjects[indexColumn][indexRow] = newObject;
         });
     });
 }
+
 

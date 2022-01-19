@@ -37,8 +37,14 @@ let playerStartWidth;
 let playerStopsMoving;
 let playerMovement = {
     x: 0,
-    y: 0,
-    move: false
+    y: 0
+}
+
+let allowKey = {
+    top: true,
+    right: true,
+    bottom: true,
+    left: true
 }
 
 function setPositionX(position) {
@@ -111,16 +117,57 @@ function update(timePassedSinceLastRender) {
 
     updateMovement(timePassedSinceLastRender);
 
+    allowKey.top = true;
+    allowKey.right = true;
+    allowKey.bottom = true;
+    allowKey.left = true;
+
     player.update(timePassedSinceLastRender, playerMovement);
 
     //If the world is moving not the character, calculate the first visible column
     setCamera(calcFirstVisibleColumn(positionX));
 
     //only update elements in visible area
+    let playerHit = player.getHitBox();
     for(let i = camera.firstRenderedColumn; i <= camera.lastRenderedColumn; i++) {
         worldObjects[i].forEach((worldObject) => {
             if(worldObject !== null) {
                 worldObject.update();
+                if(checkCollisionBetween(player, worldObject)){
+                    if(worldObject instanceof Barrier) {
+                        let objectHit = worldObject.getHitBox();
+
+                        //Make checks on which side the object is hit; highest distance an object can intersect is by the half of
+                        let hitRight = Math.abs(playerHit.x - objectHit.x) <= playerHit.w && (playerHit.x - objectHit.x) < -objectHit.w/4;
+                        let hitBottom = Math.abs(playerHit.y - objectHit.y) <= playerHit.h && (playerHit.y - objectHit.y) < -objectHit.w/4;
+                        let hitLeft =  Math.abs(playerHit.x - objectHit.x) <= objectHit.w && (playerHit.x - objectHit.x) > objectHit.w/4;
+                        let hitTop=  Math.abs(playerHit.y - objectHit.y) <= objectHit.h && (playerHit.y - objectHit.y) > objectHit.w/4;
+
+                        //Check if object is intersecting with the player on a corner, that means two expressions are true
+                        if(!((hitLeft && hitTop) || (hitTop && hitRight) || (hitRight && hitBottom) || (hitBottom && hitLeft))) {
+                            //Object is hit on the right side
+                            if(hitRight) { allowKey.right = false; }
+
+                            //Object is hit on the bottom
+                            if(hitBottom) { allowKey.bottom = false; }
+
+                            //Object is hit on the left side
+                            if(hitLeft) { allowKey.left = false; }
+
+                            //Object is hit on the top
+                            if(hitTop) { allowKey.top = false; }
+                        }
+                    }
+                    if(worldObject instanceof Collectable) {
+                        console.log("Collectable");
+                    }
+                    if(worldObject instanceof Monster) {
+                        console.log("Monster");
+                    }
+                    if(worldObject instanceof Portal) {
+                        console.log("Portal");
+                    }
+                }
             }
         });
     }
@@ -132,8 +179,12 @@ function render() {
     //delete the canvas
     ctx.clearRect(0, 0, CONFIG.width, CONFIG.height);
 
-    player.render();
+    moveWorld(positionX);
+
     player.drawHitBox();
+    moveWorld(positionX);
+    player.render();
+
 
     //draw new frame
     //only render elements in visible area
@@ -152,8 +203,6 @@ function render() {
         gameBorder.render();
         gameBorder.drawHitBox();
     });
-
-
 
     ctx.resetTransform();
 }
@@ -209,26 +258,23 @@ function updateMovement(timePassedSinceLastRender) {
     let movementY;
 
     //set directions x
-    if(currentKeys["ArrowRight"] || currentKeys["KeyD"] ) {movementX = 1;}
-    else if(currentKeys["ArrowLeft"] || currentKeys["KeyA"] ) {movementX = -1;}
+    if((currentKeys["ArrowRight"] || currentKeys["KeyD"]) && allowKey.right ) {movementX = 1;}
+    else if((currentKeys["ArrowLeft"] || currentKeys["KeyA"]) && allowKey.left) {movementX = -1;}
     else {movementX = 0;}
 
     //set directions y
-    if(currentKeys["ArrowUp"] || currentKeys["KeyW"] ) {movementY = -1; }
-    else if(currentKeys["ArrowDown"] || currentKeys["KeyS"] ) {movementY = 1 ;}
+    if((currentKeys["ArrowUp"] || currentKeys["KeyW"]) && allowKey.top) {movementY = -1; }
+    else if((currentKeys["ArrowDown"] || currentKeys["KeyS"])  && allowKey.bottom) {movementY = 1 ;}
     else {movementY = 0;}
 
     //movement of the map
     setPositionX(positionX + timePassedSinceLastRender * movementX * velocity);
 
-    //check if player or screen moves
-    let doesPlayerMove = (positionX < playerStopsMoving || positionX > CONFIG.lastColumn * CONFIG.tileSize - CONFIG.width/2 - playerStartWidth);
 
     //set the movement for the player
     playerMovement = {
         x: movementX,
-        y: movementY,
-        move: doesPlayerMove
+        y: movementY
     }
 }
 
@@ -280,4 +326,15 @@ function setCamera(firstColumn) {
         firstRenderedColumn: firstRenderedColumnNew,
         lastRenderedColumn: lastRenderedColumnNew
     };
+}
+
+function checkCollisionBetween (gameObjectA, gameObjectB) {
+    let hbA = gameObjectA.getHitBox();
+    let hbB = gameObjectB.getHitBox();
+
+    //return if objects hit each other or not
+    return hbA.x < hbB.x + hbB.w &&
+        hbA.x + hbA.w > hbB.x &&
+        hbA.y < hbB.y + hbB.h &&
+        hbA.y + hbA.h > hbB.y;
 }

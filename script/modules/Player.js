@@ -60,7 +60,7 @@ class Player extends GameObject {
 
     init() {}
 
-    update(timePassedSincelastRender, moving = {x: 0, y: 0, move: false }) {
+    update(timePassedSincelastRender, moving = {x: 0, y: 0}) {
         if (moving.x === 1) this.direction = "right";
         else if (moving.x === -1) this.direction = "left";
 
@@ -69,8 +69,7 @@ class Player extends GameObject {
 
         this.setY(this.y + timePassedSincelastRender * moving.y * this.velocity);
 
-        if(moving.move)
-            this.setX(this.x + timePassedSincelastRender * moving.x * this.velocity);
+        this.setX(this.x + timePassedSincelastRender * moving.x * this.velocity);
     }
 
     render() {

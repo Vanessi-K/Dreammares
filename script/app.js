@@ -232,25 +232,19 @@ function setCamera(firstColumn) {
     lastRenderedColumnNew = lastVisibleColumnNew + CONFIG.columnOffset;
 
     //set the first screen which is rendered
-    if(firstVisibleColumnNew < 0) {
+    if(firstVisibleColumnNew < 0 || firstVisibleColumnNew < CONFIG.columnOffset) {
         firstVisibleColumnNew = 0;
         firstRenderedColumnNew = 0;
-    } else if(firstVisibleColumnNew < CONFIG.columnOffset) {
-        firstRenderedColumnNew = 0;
+        lastVisibleColumnNew = firstVisibleColumnNew + CONFIG.columnsPerWidth;
+        lastRenderedColumnNew = lastVisibleColumnNew + CONFIG.columnOffset;
     }
 
     //set the screens before the last
     if(lastVisibleColumnNew > CONFIG.lastColumn - CONFIG.columnOffset) {
         lastVisibleColumnNew = CONFIG.lastColumn;
         lastRenderedColumnNew = CONFIG.lastColumn;
-    }
-
-    //Set the last screen which is rendered
-    if (firstVisibleColumnNew - CONFIG.columnOffset > CONFIG.lastColumn - CONFIG.columnOffset) {
-        firstVisibleColumnNew = CONFIG.lastColumn - CONFIG.columnsPerWidth;
-        lastVisibleColumnNew = CONFIG.lastColumn;
+        firstVisibleColumnNew = lastVisibleColumnNew - CONFIG.columnsPerWidth;
         firstRenderedColumnNew = firstVisibleColumnNew - CONFIG.columnOffset;
-        lastRenderedColumnNew = CONFIG.lastColumn;
     }
 
     camera = {

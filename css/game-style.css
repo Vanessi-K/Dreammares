@@ -25,8 +25,23 @@ body {
 }
 
 #bar-area {
-    z-index: 100;
     position: absolute;
     left: calc((100vw - (100vh/9*16))/2);
     top: 0;
+}
+
+#controls-description {
+    position: absolute;
+    top: 10vh;
+    visibility: hidden;
+    opacity: 1;
+    animation: 6s fadeOut;
+    animation-iteration-count: 1;
+}
+
+@keyframes fadeOut {
+    0% {opacity: 1; visibility: visible}
+    50% {opacity: 1;}
+    99% {visibility: visible;}
+    100% {opacity: 0; visibility: hidden}
 }

@@ -18,8 +18,8 @@ class Monster extends GameObject {
     }
 
     getHitBox() {
-        let minusX = 30;
-        let minusY = 30;
+        let minusX = 40;
+        let minusY = 40;
         let hitBox = super.getHitBox()
 
         hitBox.x += minusX;

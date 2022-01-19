@@ -31,7 +31,7 @@ let worldObjects = new Array(worldMatrix.length);
 let gameBorders = [];
 let currentKeys = [];
 let positionX = 0;
-let velocity = 1;
+let velocity = 0.3;
 let playerStartPositionX = 200;
 let playerStartWidth;
 let playerStopsMoving;
@@ -128,20 +128,21 @@ function update(timePassedSinceLastRender) {
     setCamera(calcFirstVisibleColumn(positionX));
 
     //only update elements in visible area
-    let playerHit = player.getHitBox();
+
     for(let i = camera.firstRenderedColumn; i <= camera.lastRenderedColumn; i++) {
         worldObjects[i].forEach((worldObject) => {
             if(worldObject !== null) {
                 worldObject.update();
                 if(checkCollisionBetween(player, worldObject)){
                     if(worldObject instanceof Barrier) {
+                        let playerHit = player.getHitBox();
                         let objectHit = worldObject.getHitBox();
 
                         //Make checks on which side the object is hit; highest distance an object can intersect is by the half of
-                        let hitRight = Math.abs(playerHit.x - objectHit.x) <= playerHit.w && (playerHit.x - objectHit.x) < -objectHit.w/4;
-                        let hitBottom = Math.abs(playerHit.y - objectHit.y) <= playerHit.h && (playerHit.y - objectHit.y) < -objectHit.w/4;
-                        let hitLeft =  Math.abs(playerHit.x - objectHit.x) <= objectHit.w && (playerHit.x - objectHit.x) > objectHit.w/4;
-                        let hitTop=  Math.abs(playerHit.y - objectHit.y) <= objectHit.h && (playerHit.y - objectHit.y) > objectHit.w/4;
+                        let hitRight = Math.abs(playerHit.x - objectHit.x) <= playerHit.w && (playerHit.x - objectHit.x) < -(playerHit.w - objectHit.w);
+                        let hitBottom = Math.abs(playerHit.y - objectHit.y) <= playerHit.h && (playerHit.y - objectHit.y) < -(playerHit.h - objectHit.h);
+                        let hitLeft =  Math.abs(playerHit.x - objectHit.x) <= objectHit.w && (playerHit.x - objectHit.x) < objectHit.w;
+                        let hitTop=  Math.abs(playerHit.y - objectHit.y) <= objectHit.h && (playerHit.y - objectHit.y) < objectHit.h;
 
                         //Check if object is intersecting with the player on a corner, that means two expressions are true
                         if(!((hitLeft && hitTop) || (hitTop && hitRight) || (hitRight && hitBottom) || (hitBottom && hitLeft))) {

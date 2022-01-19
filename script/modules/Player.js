@@ -115,11 +115,11 @@ class Player extends GameObject {
     }
 
     getHitBox() {
-        let minusXRight = 100;
-        let minusXLeft = 40;
+        let minusXRight = 45;
+        let minusXLeft = 20;
         let minusYTop = 35;
-        let minusYBottom = 20;
-        let hitBox = super.getHitBox()
+        let minusYBottom = 15;
+        let hitBox = super.getHitBox();
 
         hitBox.x += minusXLeft;
         hitBox.y += minusYTop;

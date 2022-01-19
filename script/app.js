@@ -60,9 +60,9 @@ function init() {
 
     //possibility to change to fullscreen
     window.addEventListener("keypress", e => {
-        switch (e.key) {
-            case "i": document.body.requestFullscreen(); break;
-            case "o": document.exitFullscreen(); break;
+        switch (e.code) {
+            case "KeyI": document.body.requestFullscreen(); break;
+            case "KeyO": document.exitFullscreen(); break;
         }
     });
 
@@ -209,13 +209,13 @@ function updateMovement(timePassedSinceLastRender) {
     let movementY;
 
     //set directions x
-    if(currentKeys["ArrowRight"]) {movementX = 1;}
-    else if(currentKeys["ArrowLeft"]) {movementX = -1;}
+    if(currentKeys["ArrowRight"] || currentKeys["KeyD"] ) {movementX = 1;}
+    else if(currentKeys["ArrowLeft"] || currentKeys["KeyA"] ) {movementX = -1;}
     else {movementX = 0;}
 
     //set directions y
-    if(currentKeys["ArrowUp"]) {movementY = -1; }
-    else if(currentKeys["ArrowDown"]) {movementY = 1 ;}
+    if(currentKeys["ArrowUp"] || currentKeys["KeyW"] ) {movementY = -1; }
+    else if(currentKeys["ArrowDown"] || currentKeys["KeyS"] ) {movementY = 1 ;}
     else {movementY = 0;}
 
     //movement of the map

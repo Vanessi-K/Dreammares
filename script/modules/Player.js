@@ -45,8 +45,6 @@ class Player extends GameObject {
             }
         }
     };
-    movementX = 0;
-    movementY = 0;
 
     constructor(ctx, x, y, velocity) {
         super(ctx, x, y);
@@ -64,12 +62,17 @@ class Player extends GameObject {
 
     init() {}
 
-    update(moving = {x: 0, y: 0 }) {
+    update(timePassedSincelastRender, moving = {x: 0, y: 0, move: false }) {
         if (moving.x === 1) this.direction = "right";
         else if (moving.x === -1) this.direction = "left";
 
         //Change states
         (moving.x !== 0 || moving.y !== 0) ? this.state = "movement" : this.state = "idle";
+
+        this.setY(this.y + timePassedSincelastRender * moving.y * this.velocity);
+
+        if(moving.move)
+            this.setX(this.x + timePassedSincelastRender * moving.x * this.velocity);
     }
 
     render() {
@@ -92,6 +95,14 @@ class Player extends GameObject {
 
         //reset the origin of the canvas
         this.ctx.resetTransform();
+    }
+
+    setY(y) {
+        this.y = y;
+    }
+
+    setX(x) {
+        this.x = x;
     }
 
     getImageSpriteCoordinates(sprite) {

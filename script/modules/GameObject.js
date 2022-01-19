@@ -16,6 +16,8 @@ class GameObject {
     render() {}
 
     getHitbox() {}
+
+
 }
 
 export default GameObject;

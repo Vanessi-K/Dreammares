@@ -30,11 +30,15 @@ let player;
 let worldObjects = new Array(worldMatrix.length);
 let gameBorders = [];
 let currentKeys = [];
-let positionX = -CONFIG.width/2;
+let positionX = 0;
 let velocity = 1;
+let playerStartPositionX = 200;
+let playerStartWidth;
+let playerStopsMoving;
 let playerMovement = {
     x: 0,
-    y: 0
+    y: 0,
+    move: false
 }
 
 function setPositionX(position) {
@@ -78,7 +82,10 @@ function init() {
     createWorld();
 
     //Player
-    player = new Player(ctx, 200, 770, velocity);
+    player = new Player(ctx, playerStartPositionX, 770, velocity);
+    playerStartWidth = playerStartPositionX + player.width/2;
+    playerStopsMoving = CONFIG.width/2 - playerStartWidth;
+
 
     //top and bottom boundary
     gameBorders.push(new Boundary(ctx, 0, 0, CONFIG.width, CONFIG.topOffset));
@@ -104,7 +111,7 @@ function update(timePassedSinceLastRender) {
 
     updateMovement(timePassedSinceLastRender);
 
-    player.update(playerMovement);
+    player.update(timePassedSinceLastRender, playerMovement);
 
     //If the world is moving not the character, calculate the first visible column
     setCamera(calcFirstVisibleColumn(positionX));
@@ -206,32 +213,27 @@ function updateMovement(timePassedSinceLastRender) {
     //movement of the map
     setPositionX(positionX + timePassedSinceLastRender * movementX * velocity);
 
+    //check if player or screen moves
+    let doesPlayerMove = (positionX < playerStopsMoving || positionX > CONFIG.lastColumn * CONFIG.tileSize - CONFIG.width/2 - playerStartWidth);
+
     //set the movement for the player
     playerMovement = {
         x: movementX,
-        y: movementY
+        y: movementY,
+        move: doesPlayerMove
     }
-}
-
-function updatePlayerMovement(x, y) {
-    let directionValue = null;
-    if(x === 1) directionValue = "right";
-    else if( x === -1) directionValue = "left";
-
-    //setting everything the player needs to move
-
 }
 
 //Move the canvas before to suggest movement
 function moveWorld(scrollPositionX) {
     //Check if scrollPositionX is in the range where the screen is moved and not the character, if the character should be moved values are set to the boundaries
-    scrollPositionX -= CONFIG.width/2;
+    scrollPositionX -= playerStopsMoving;
     ctx.translate(-Math.min((Math.max(0,scrollPositionX)),(CONFIG.lastColumn - CONFIG.columnsPerWidth) * CONFIG.tileSize), 0);
 }
 
 //calculate the first visible column index based on the current position of the screen
 function calcFirstVisibleColumn(scrollPositionX) {
-    scrollPositionX -= CONFIG.width/2;
+    scrollPositionX -= playerStopsMoving;
     //Check if scrollPositionX is in the range where the screen is moved and not the character, if the character should be moved values are set to the boundaries and then calculated
     return Math.floor(Math.min((Math.max(0,scrollPositionX)),(CONFIG.lastColumn - CONFIG.columnsPerWidth) * CONFIG.tileSize) / CONFIG.tileSize);
 }

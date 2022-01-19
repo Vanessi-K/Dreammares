@@ -44,6 +44,8 @@ class Player extends GameObject {
             }
         }
     };
+    movementX = 0;
+    movementY = 0;
 
     constructor(ctx, x, y) {
         super(ctx, x, y);

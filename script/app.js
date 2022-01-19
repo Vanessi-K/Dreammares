@@ -29,6 +29,17 @@ let lastTickTimestamp;
 let player;
 let worldObjects = new Array(worldMatrix.length);
 let gameObjects = [];
+let movementX = 0;
+let movementY = 0;
+let currentKeys = [];
+let positionX = -CONFIG.width/2;
+let velocity = 1;
+
+function setPositionX(position) {
+    if(positionX < 0) positionX = 0;
+    else if(positionX > CONFIG.lastColumn * CONFIG.tileSize) positionX = CONFIG.lastColumn * CONFIG.tileSize;
+    else positionX = position;
+}
 
 window.onload = () => {
     init();
@@ -41,6 +52,26 @@ function init() {
     canvas.setAttribute("width", CONFIG.width);
     canvas.setAttribute("height", CONFIG.height);
 
+    //possibility to change to fullscreen
+    window.addEventListener("keypress", e => {
+        switch (e.key) {
+            case "i": document.body.requestFullscreen(); break;
+            case "o": document.exitFullscreen(); break;
+        }
+    });
+
+    document.addEventListener('keydown', (key) => {
+        //check if game relevant keys are pressed an prevent default
+        if(key.code.substring(0,5) === "Arrow" || key.code === "Space" || key.code === "KeyR") {
+            key.preventDefault();
+        }
+        currentKeys[key.code] = true;
+    });
+
+    document.addEventListener('keyup', (key) => {
+        currentKeys[key.code] = false;
+    });
+
     createWorld();
 
     //Player
@@ -52,8 +83,6 @@ function init() {
     gameObjects.push(new Boundary(ctx, 0, CONFIG.height - CONFIG.bottomOffset, CONFIG.width, CONFIG.bottomOffset));
 
     lastTickTimestamp = performance.now();
-
-    console.log(camera);
 
     gameLoop();
 }
@@ -71,6 +100,11 @@ function gameLoop() {
 
 function update(timePassedSinceLastRender) {
 
+    updateMovement(timePassedSinceLastRender);
+
+    //If the world is moving not the character, calculate the first visible column
+    setCamera(calcFirstVisibleColumn(positionX));
+
     //only update elements in visible area
     for(let i = camera.firstRenderedColumn; i <= camera.lastRenderedColumn; i++) {
         worldObjects[i].forEach((worldObject) => {
@@ -87,17 +121,20 @@ function render() {
     //delete the canvas
     ctx.clearRect(0, 0, CONFIG.width, CONFIG.height);
 
+    gameObjects.forEach((gameObject) => gameObject.render());
+
     //draw new frame
     //only render elements in visible area
     for(let i = camera.firstRenderedColumn; i <= camera.lastRenderedColumn; i++) {
         worldObjects[i].forEach((worldObject) => {
             if(worldObject !== null) {
+                moveWorld(positionX);
                 worldObject.render();
             }
         });
     }
 
-    gameObjects.forEach((gameObject) => gameObject.render());
+    ctx.resetTransform();
 }
 
 //read numbers from array and change them into objects
@@ -146,6 +183,42 @@ function createWorld() {
     });
 }
 
+function updateMovement(timePassedSinceLastRender) {
+    //set directions x
+    if(currentKeys["ArrowRight"]) {movementX = 1;}
+    else if(currentKeys["ArrowLeft"]) {movementX = -1;}
+    else {movementX = 0;}
+
+    //set directions y
+    if(currentKeys["ArrowUp"]) {movementY = -1; }
+    else if(currentKeys["ArrowDown"]) {movementY = 1 ;}
+    else {movementY = 0;}
+
+    //Change diagonal speed
+    if(movementX !== 0 && movementY !== 0) {
+        movementX /= Math.hypot(movementX, movementY);
+        movementY /= Math.hypot(movementX, movementY);
+    }
+
+    //movement of the map
+    setPositionX(positionX + timePassedSinceLastRender * movementX * velocity);
+
+}
+
+//Move the canvas before to suggest movement
+function moveWorld(scrollPositionX) {
+    //Check if scrollPositionX is in the range where the screen is moved and not the character, if the character should be moved values are set to the boundaries
+    scrollPositionX -= CONFIG.width/2;
+    ctx.translate(-Math.min((Math.max(0,scrollPositionX)),(CONFIG.lastColumn - CONFIG.columnsPerWidth) * CONFIG.tileSize), 0);
+}
+
+//calculate the first visible column index based on the current position of the screen
+function calcFirstVisibleColumn(scrollPositionX) {
+    scrollPositionX -= CONFIG.width/2;
+    //Check if scrollPositionX is in the range where the screen is moved and not the character, if the character should be moved values are set to the boundaries and then calculated
+    return Math.floor(Math.min((Math.max(0,scrollPositionX)),(CONFIG.lastColumn - CONFIG.columnsPerWidth) * CONFIG.tileSize) / CONFIG.tileSize);
+}
+
 //Calculate the boundaries for the camera, which elements are drawn on the canvas
 function setCamera(firstColumn) {
     let firstVisibleColumnNew;
@@ -154,10 +227,11 @@ function setCamera(firstColumn) {
     let lastRenderedColumnNew;  //Rendered, but not fully in Viewport
 
     firstVisibleColumnNew = firstColumn;
-    lastVisibleColumnNew = firstVisibleColumnNew + CONFIG.columnOffset;
+    lastVisibleColumnNew = firstVisibleColumnNew + CONFIG.columnsPerWidth;
     firstRenderedColumnNew = firstVisibleColumnNew - CONFIG.columnOffset;
     lastRenderedColumnNew = lastVisibleColumnNew + CONFIG.columnOffset;
 
+    //set the first screen which is rendered
     if(firstVisibleColumnNew < 0) {
         firstVisibleColumnNew = 0;
         firstRenderedColumnNew = 0;
@@ -165,9 +239,18 @@ function setCamera(firstColumn) {
         firstRenderedColumnNew = 0;
     }
 
-    if (lastVisibleColumnNew > CONFIG.lastColumn - CONFIG.columnOffset) {
-        lastVisibleColumnNew = CONFIG.lastColumn - CONFIG.columnOffset;
-        lastRenderedColumnNew = lastVisibleColumnNew + CONFIG.columnOffset
+    //set the screens before the last
+    if(lastVisibleColumnNew > CONFIG.lastColumn - CONFIG.columnOffset) {
+        lastVisibleColumnNew = CONFIG.lastColumn;
+        lastRenderedColumnNew = CONFIG.lastColumn;
+    }
+
+    //Set the last screen which is rendered
+    if (firstVisibleColumnNew - CONFIG.columnOffset > CONFIG.lastColumn - CONFIG.columnOffset) {
+        firstVisibleColumnNew = CONFIG.lastColumn - CONFIG.columnsPerWidth;
+        lastVisibleColumnNew = CONFIG.lastColumn;
+        firstRenderedColumnNew = firstVisibleColumnNew - CONFIG.columnOffset;
+        lastRenderedColumnNew = CONFIG.lastColumn;
     }
 
     camera = {
@@ -177,5 +260,3 @@ function setCamera(firstColumn) {
         lastRenderedColumn: lastRenderedColumnNew
     };
 }
-
-

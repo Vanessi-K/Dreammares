@@ -28,12 +28,14 @@ let ctx;
 let lastTickTimestamp;
 let player;
 let worldObjects = new Array(worldMatrix.length);
-let gameObjects = [];
-let movementX = 0;
-let movementY = 0;
+let gameBorders = [];
 let currentKeys = [];
 let positionX = -CONFIG.width/2;
 let velocity = 1;
+let playerMovement = {
+    x: 0,
+    y: 0
+}
 
 function setPositionX(position) {
     if(positionX < 0) positionX = 0;
@@ -60,6 +62,7 @@ function init() {
         }
     });
 
+    //game relevant listeners
     document.addEventListener('keydown', (key) => {
         //check if game relevant keys are pressed an prevent default
         if(key.code.substring(0,5) === "Arrow" || key.code === "Space" || key.code === "KeyR") {
@@ -75,12 +78,11 @@ function init() {
     createWorld();
 
     //Player
-    player = new Player(ctx, 200, 770);
-    gameObjects.push(player);
+    player = new Player(ctx, 200, 770, velocity);
 
     //top and bottom boundary
-    gameObjects.push(new Boundary(ctx, 0, 0, CONFIG.width, CONFIG.topOffset));
-    gameObjects.push(new Boundary(ctx, 0, CONFIG.height - CONFIG.bottomOffset, CONFIG.width, CONFIG.bottomOffset));
+    gameBorders.push(new Boundary(ctx, 0, 0, CONFIG.width, CONFIG.topOffset));
+    gameBorders.push(new Boundary(ctx, 0, CONFIG.height - CONFIG.bottomOffset, CONFIG.width, CONFIG.bottomOffset));
 
     lastTickTimestamp = performance.now();
 
@@ -102,6 +104,8 @@ function update(timePassedSinceLastRender) {
 
     updateMovement(timePassedSinceLastRender);
 
+    player.update(playerMovement);
+
     //If the world is moving not the character, calculate the first visible column
     setCamera(calcFirstVisibleColumn(positionX));
 
@@ -114,14 +118,14 @@ function update(timePassedSinceLastRender) {
         });
     }
 
-    gameObjects.forEach((gameObject) => gameObject.update());
+    gameBorders.forEach((gameBorder) => gameBorder.update());
 }
 
 function render() {
     //delete the canvas
     ctx.clearRect(0, 0, CONFIG.width, CONFIG.height);
 
-    gameObjects.forEach((gameObject) => gameObject.render());
+    player.render();
 
     //draw new frame
     //only render elements in visible area
@@ -133,6 +137,8 @@ function render() {
             }
         });
     }
+
+    gameBorders.forEach((gameBorder) => gameBorder.render());
 
     ctx.resetTransform();
 }
@@ -184,6 +190,9 @@ function createWorld() {
 }
 
 function updateMovement(timePassedSinceLastRender) {
+    let movementX;
+    let movementY;
+
     //set directions x
     if(currentKeys["ArrowRight"]) {movementX = 1;}
     else if(currentKeys["ArrowLeft"]) {movementX = -1;}
@@ -194,14 +203,22 @@ function updateMovement(timePassedSinceLastRender) {
     else if(currentKeys["ArrowDown"]) {movementY = 1 ;}
     else {movementY = 0;}
 
-    //Change diagonal speed
-    if(movementX !== 0 && movementY !== 0) {
-        movementX /= Math.hypot(movementX, movementY);
-        movementY /= Math.hypot(movementX, movementY);
-    }
-
     //movement of the map
     setPositionX(positionX + timePassedSinceLastRender * movementX * velocity);
+
+    //set the movement for the player
+    playerMovement = {
+        x: movementX,
+        y: movementY
+    }
+}
+
+function updatePlayerMovement(x, y) {
+    let directionValue = null;
+    if(x === 1) directionValue = "right";
+    else if( x === -1) directionValue = "left";
+
+    //setting everything the player needs to move
 
 }
 

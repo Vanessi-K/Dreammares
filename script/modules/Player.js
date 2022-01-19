@@ -6,6 +6,7 @@ class Player extends GameObject {
     direction = "right";
     width = 160;
     height = 290;
+    velocity;
     sprites = {
         idle: {
             direction: {
@@ -47,8 +48,10 @@ class Player extends GameObject {
     movementX = 0;
     movementY = 0;
 
-    constructor(ctx, x, y) {
+    constructor(ctx, x, y, velocity) {
         super(ctx, x, y);
+
+        this.velocity = velocity;
 
         Object.values(this.sprites).forEach((sprite) => {
             sprite.direction.right.image = new Image();
@@ -61,7 +64,13 @@ class Player extends GameObject {
 
     init() {}
 
-    update() {}
+    update(moving = {x: 0, y: 0 }) {
+        if (moving.x === 1) this.direction = "right";
+        else if (moving.x === -1) this.direction = "left";
+
+        //Change states
+        (moving.x !== 0 || moving.y !== 0) ? this.state = "movement" : this.state = "idle";
+    }
 
     render() {
         this.ctx.translate(this.x, this.y);

@@ -82,7 +82,7 @@ function init() {
     createWorld();
 
     //Player
-    player = new Player(ctx, playerStartPositionX, 770, velocity);
+    player = new Player(ctx, playerStartPositionX, 770, 160, 290, velocity);
     playerStartWidth = playerStartPositionX + player.width/2;
     playerStopsMoving = CONFIG.width/2 - playerStartWidth;
 
@@ -133,6 +133,7 @@ function render() {
     ctx.clearRect(0, 0, CONFIG.width, CONFIG.height);
 
     player.render();
+    player.drawHitBox();
 
     //draw new frame
     //only render elements in visible area
@@ -141,11 +142,18 @@ function render() {
             if(worldObject !== null) {
                 moveWorld(positionX);
                 worldObject.render();
+                moveWorld(positionX);
+                worldObject.drawHitBox();
             }
         });
     }
 
-    gameBorders.forEach((gameBorder) => gameBorder.render());
+    gameBorders.forEach((gameBorder) => {
+        gameBorder.render();
+        gameBorder.drawHitBox();
+    });
+
+
 
     ctx.resetTransform();
 }

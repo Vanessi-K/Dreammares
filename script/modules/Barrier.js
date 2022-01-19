@@ -5,8 +5,10 @@ class Barrier extends GameObject {
     image = new Image();
 
     constructor(ctx, x, y, imagePath) {
-        super(ctx, x, y);
+        super(ctx, x, y, 0, 0);
         this.image.src = imagePath;
+        this.width = this.image.width;
+        this.height = this.image.height;
     }
 
     render() {
@@ -15,6 +17,14 @@ class Barrier extends GameObject {
         this.ctx.resetTransform();
     }
 
+    getHitBox() {
+        return {
+            x: this.x,
+            y: this.y,
+            w: this.width,
+            h: this.height
+        }
+    }
 }
 
 export default Barrier;

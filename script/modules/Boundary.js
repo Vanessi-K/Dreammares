@@ -18,6 +18,23 @@ class Boundary extends GameObject {
         this.ctx.resetTransform();
     }
 
+    getHitBox() {
+        return {
+            x: this.x,
+            y: this.y,
+            w: this.width,
+            h: this.height
+        }
+    }
+
+    drawHitBox() {
+        //debug bounding box
+        let hitBox = this.getHitBox();
+        this.ctx.translate(hitBox.x, hitBox.y);
+        this.ctx.lineWidth = 5;
+        this.ctx.strokeRect(0, 0, hitBox.w, hitBox.h);
+        this.ctx.resetTransform();
+    }
 }
 
 export default Boundary;

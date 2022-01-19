@@ -4,8 +4,6 @@ class Player extends GameObject {
 
     state = "idle";
     direction = "right";
-    width = 160;
-    height = 290;
     velocity;
     sprites = {
         idle: {
@@ -46,8 +44,8 @@ class Player extends GameObject {
         }
     };
 
-    constructor(ctx, x, y, velocity) {
-        super(ctx, x, y);
+    constructor(ctx, x, y, width, height, velocity) {
+        super(ctx, x, y, width, height);
 
         this.velocity = velocity;
 
@@ -115,9 +113,22 @@ class Player extends GameObject {
             srcWidth: sprite.frameSize.width,
             srcHeight: sprite.frameSize.height
         }
-
     }
 
+    getHitBox() {
+        let minusXRight = 100;
+        let minusXLeft = 40;
+        let minusYTop = 35;
+        let minusYBottom = 20;
+        let hitBox = super.getHitBox()
+
+        hitBox.x += minusXLeft;
+        hitBox.y += minusYTop;
+        hitBox.w -= minusXRight - minusXLeft;
+        hitBox.h -= (minusYTop + minusYBottom);
+
+        return hitBox;
+    }
 }
 
 export default Player;

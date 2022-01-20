@@ -31,13 +31,14 @@ let worldObjects = new Array(worldMatrix.length);
 let gameBorders = [];
 let currentKeys = [];
 let positionX = 0;
-let velocity = 0.3;
+let velocity = 0.5;
 let playerStartPositionX = 200;
 let playerStartWidthCenter;
 let playerStopsMoving;
 let playerMovement = {
     x: 0,
-    y: 0
+    y: 0,
+    goDown: true
 }
 
 let allowKey = {
@@ -101,7 +102,6 @@ function init() {
     playerStartWidthCenter = playerStartPositionX + player.width/2;
     playerStopsMoving = CONFIG.width/2 - playerStartWidthCenter;
 
-
     //top and bottom boundary
     gameBorders.push(new Boundary(ctx, -playerStartPositionX, 0, CONFIG.lastColumn * CONFIG.tileSize + 2 * playerStartPositionX, CONFIG.topOffset));
     gameBorders.push(new Boundary(ctx, -playerStartPositionX, CONFIG.height - CONFIG.bottomOffset, CONFIG.lastColumn * CONFIG.tileSize + 2 * playerStartPositionX, CONFIG.bottomOffset));
@@ -128,7 +128,7 @@ function update(timePassedSinceLastRender) {
 
     player.update(timePassedSinceLastRender, playerMovement);
 
-    //Set all key back to beeing allowed
+    //Set all key back to being allowed
     for(let side in allowKey) {
         allowKey[side] = true;
     }
@@ -146,10 +146,12 @@ function update(timePassedSinceLastRender) {
                         checkCollisionDirection(player.getHitBox(), worldObject.getHitBox());
                     }
                     if(worldObject instanceof Collectable) {
-                        console.log("Collectable");
+                        player.increasePower();
+                        removeObject(i, worldObjects[i].indexOf(worldObject));
                     }
                     if(worldObject instanceof Monster) {
-                        console.log("Monster");
+                        player.decreaseHealth();
+                        removeObject(i, worldObjects[i].indexOf(worldObject));
                     }
                     if(worldObject instanceof Portal) {
                         console.log("Portal");
@@ -172,9 +174,10 @@ function render() {
     //delete the canvas
     ctx.clearRect(0, 0, CONFIG.width, CONFIG.height);
 
-    moveWorld(positionX);
+    gameBorders.forEach((gameBorder) => {
+        gameBorder.render();
+    });
 
-    player.drawHitBox();
     moveWorld(positionX);
     player.render();
 
@@ -186,16 +189,9 @@ function render() {
             if(worldObject !== null) {
                 moveWorld(positionX);
                 worldObject.render();
-                moveWorld(positionX);
-                worldObject.drawHitBox();
             }
         });
     }
-
-    gameBorders.forEach((gameBorder) => {
-        gameBorder.render();
-        gameBorder.drawHitBox();
-    });
 
     //Set boundaries
     setBoundaries(positionX);
@@ -266,11 +262,11 @@ function updateMovement(timePassedSinceLastRender) {
     //movement of the map
     setPositionX(positionX + timePassedSinceLastRender * movementX * velocity);
 
-
     //set the movement for the player
     playerMovement = {
         x: movementX,
-        y: movementY
+        y: movementY,
+        goDown: allowKey.bottom
     }
 }
 
@@ -356,4 +352,8 @@ function checkCollisionDirection (playerHit, objectHit) {
         //Object is hit on the top
         if(hitTop) { allowKey.top = false; }
     }
+}
+
+function removeObject(indexColumn, indexRow) {
+    worldObjects[indexColumn][indexRow] = null;
 }

@@ -7,6 +7,7 @@ class Player extends GameObject {
     health = 3;
     power = 0;
     velocity;
+    g = 0.13;
     sprites = {
         idle: {
             direction: {
@@ -70,14 +71,17 @@ class Player extends GameObject {
 
     init() {}
 
-    update(timePassedSincelastRender, moving = {x: 0, y: 0}) {
+    update(timePassedSincelastRender, moving = {x: 0, y: 0, goDown: false}) {
         if (moving.x === 1) this.direction = "right";
         else if (moving.x === -1) this.direction = "left";
 
         //Change states
         (moving.x !== 0 || moving.y !== 0) ? this.state = "movement" : this.state = "idle";
 
-        this.setY(this.y + timePassedSincelastRender * moving.y * this.velocity);
+        //If the player can still go down or the player moves up (calculate y-position)
+        if(moving.goDown || moving.y === -1) {
+            this.setY(this.y + timePassedSincelastRender * moving.y * this.velocity + (this.g * timePassedSincelastRender^2 /2));
+        }
 
         this.setX(this.x + timePassedSincelastRender * moving.x * this.velocity);
     }
@@ -132,11 +136,27 @@ class Player extends GameObject {
     }
 
     decreaseHealth() {
+        let heart = document.querySelector("#heart-" + this.health);
+        heart.style.opacity = "0";
         this.health--;
+
+        if(this.health === 0) {
+            this.died();
+        }
     }
 
     increasePower() {
         this.power++;
+        let powerPoint = document.querySelector("#power-point-" + this.power);
+        powerPoint.style.opacity = "1";
+    }
+
+    gravity() {
+
+    }
+
+    died() {
+
     }
 }
 

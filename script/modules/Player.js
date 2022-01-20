@@ -4,6 +4,8 @@ class Player extends GameObject {
 
     state = "idle";
     direction = "right";
+    health = 3;
+    power = 0;
     velocity;
     sprites = {
         idle: {
@@ -43,6 +45,14 @@ class Player extends GameObject {
             }
         }
     };
+
+    setY(y) {
+        this.y = y;
+    }
+
+    setX(x) {
+        this.x = x;
+    }
 
     constructor(ctx, x, y, width, height, velocity) {
         super(ctx, x, y, width, height);
@@ -94,14 +104,6 @@ class Player extends GameObject {
         this.ctx.resetTransform();
     }
 
-    setY(y) {
-        this.y = y;
-    }
-
-    setX(x) {
-        this.x = x;
-    }
-
     getImageSpriteCoordinates(sprite) {
         //getting the right frame
         let frameX = Math.floor(performance.now() / 1000 * sprite.fps % sprite.frames);
@@ -127,6 +129,14 @@ class Player extends GameObject {
         hitBox.h -= (minusYTop + minusYBottom);
 
         return hitBox;
+    }
+
+    decreaseHealth() {
+        this.health--;
+    }
+
+    increasePower() {
+        this.power++;
     }
 }
 

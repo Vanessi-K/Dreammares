@@ -33,7 +33,7 @@ let currentKeys = [];
 let positionX = 0;
 let velocity = 0.3;
 let playerStartPositionX = 200;
-let playerStartWidth;
+let playerStartWidthCenter;
 let playerStopsMoving;
 let playerMovement = {
     x: 0,
@@ -48,7 +48,7 @@ let allowKey = {
 }
 
 function setPositionX(position) {
-    if(positionX < 0) positionX = 0;
+    if(positionX < -playerStartPositionX) positionX = -playerStartPositionX;
     else if(positionX > CONFIG.lastColumn * CONFIG.tileSize) positionX = CONFIG.lastColumn * CONFIG.tileSize;
     else positionX = position;
 }
@@ -89,13 +89,13 @@ function init() {
 
     //Player
     player = new Player(ctx, playerStartPositionX, 770, 160, 290, velocity);
-    playerStartWidth = playerStartPositionX + player.width/2;
-    playerStopsMoving = CONFIG.width/2 - playerStartWidth;
+    playerStartWidthCenter = playerStartPositionX + player.width/2;
+    playerStopsMoving = CONFIG.width/2 - playerStartWidthCenter;
 
 
     //top and bottom boundary
-    gameBorders.push(new Boundary(ctx, 0, 0, CONFIG.width, CONFIG.topOffset));
-    gameBorders.push(new Boundary(ctx, 0, CONFIG.height - CONFIG.bottomOffset, CONFIG.width, CONFIG.bottomOffset));
+    gameBorders.push(new Boundary(ctx, -playerStartPositionX, 0, CONFIG.lastColumn * CONFIG.tileSize + 2 * playerStartPositionX, CONFIG.topOffset));
+    gameBorders.push(new Boundary(ctx, -playerStartPositionX, CONFIG.height - CONFIG.bottomOffset, CONFIG.lastColumn * CONFIG.tileSize + 2 * playerStartPositionX, CONFIG.bottomOffset));
 
     lastTickTimestamp = performance.now();
 
@@ -117,47 +117,24 @@ function update(timePassedSinceLastRender) {
 
     updateMovement(timePassedSinceLastRender);
 
-    allowKey.top = true;
-    allowKey.right = true;
-    allowKey.bottom = true;
-    allowKey.left = true;
-
     player.update(timePassedSinceLastRender, playerMovement);
+
+    //Set all key back to beeing allowed
+    for(let side in allowKey) {
+        allowKey[side] = true;
+    }
 
     //If the world is moving not the character, calculate the first visible column
     setCamera(calcFirstVisibleColumn(positionX));
 
     //only update elements in visible area
-
     for(let i = camera.firstRenderedColumn; i <= camera.lastRenderedColumn; i++) {
         worldObjects[i].forEach((worldObject) => {
             if(worldObject !== null) {
                 worldObject.update();
                 if(checkCollisionBetween(player, worldObject)){
                     if(worldObject instanceof Barrier) {
-                        let playerHit = player.getHitBox();
-                        let objectHit = worldObject.getHitBox();
-
-                        //Make checks on which side the object is hit; highest distance an object can intersect is by the half of
-                        let hitRight = Math.abs(playerHit.x - objectHit.x) <= playerHit.w && (playerHit.x - objectHit.x) < -(playerHit.w - objectHit.w);
-                        let hitBottom = Math.abs(playerHit.y - objectHit.y) <= playerHit.h && (playerHit.y - objectHit.y) < -(playerHit.h - objectHit.h);
-                        let hitLeft =  Math.abs(playerHit.x - objectHit.x) <= objectHit.w && (playerHit.x - objectHit.x) < objectHit.w;
-                        let hitTop=  Math.abs(playerHit.y - objectHit.y) <= objectHit.h && (playerHit.y - objectHit.y) < objectHit.h;
-
-                        //Check if object is intersecting with the player on a corner, that means two expressions are true
-                        if(!((hitLeft && hitTop) || (hitTop && hitRight) || (hitRight && hitBottom) || (hitBottom && hitLeft))) {
-                            //Object is hit on the right side
-                            if(hitRight) { allowKey.right = false; }
-
-                            //Object is hit on the bottom
-                            if(hitBottom) { allowKey.bottom = false; }
-
-                            //Object is hit on the left side
-                            if(hitLeft) { allowKey.left = false; }
-
-                            //Object is hit on the top
-                            if(hitTop) { allowKey.top = false; }
-                        }
+                        checkCollisionDirection(player.getHitBox(), worldObject.getHitBox());
                     }
                     if(worldObject instanceof Collectable) {
                         console.log("Collectable");
@@ -173,7 +150,13 @@ function update(timePassedSinceLastRender) {
         });
     }
 
-    gameBorders.forEach((gameBorder) => gameBorder.update());
+    gameBorders.forEach((gameBorder) => {
+        gameBorder.update();
+        if (checkCollisionBetween(player, gameBorder)) {
+            checkCollisionDirection(player.getHitBox(), gameBorder.getHitBox());
+        }
+    });
+
 }
 
 function render() {
@@ -258,6 +241,10 @@ function updateMovement(timePassedSinceLastRender) {
     let movementX;
     let movementY;
 
+    if(positionX === -playerStartPositionX) {
+        allowKey.left = false;
+    }
+
     //set directions x
     if((currentKeys["ArrowRight"] || currentKeys["KeyD"]) && allowKey.right ) {movementX = 1;}
     else if((currentKeys["ArrowLeft"] || currentKeys["KeyA"]) && allowKey.left) {movementX = -1;}
@@ -338,4 +325,27 @@ function checkCollisionBetween (gameObjectA, gameObjectB) {
         hbA.x + hbA.w > hbB.x &&
         hbA.y < hbB.y + hbB.h &&
         hbA.y + hbA.h > hbB.y;
+}
+
+function checkCollisionDirection (playerHit, objectHit) {
+    //Make checks on which side the object is hit; highest distance an object can intersect is by the half of
+    let hitRight = Math.abs(playerHit.x - objectHit.x) <= playerHit.w && (playerHit.x - objectHit.x) < -(playerHit.w - objectHit.w);
+    let hitBottom = Math.abs(playerHit.y - objectHit.y) <= playerHit.h && (playerHit.y - objectHit.y) < -(playerHit.h - objectHit.h);
+    let hitLeft =  Math.abs(playerHit.x - objectHit.x) <= objectHit.w && (playerHit.x - objectHit.x) < CONFIG.tileSize/2;
+    let hitTop =  Math.abs(playerHit.y - objectHit.y) <= objectHit.h;
+
+    //Check if object is intersecting with the player on a corner, that means two expressions are true
+    if(!((hitLeft && hitTop) || (hitTop && hitRight) || (hitRight && hitBottom) || (hitBottom && hitLeft))) {
+        //Object is hit on the right side
+        if(hitRight) { allowKey.right = false; }
+
+        //Object is hit on the bottom
+        if(hitBottom) { allowKey.bottom = false; }
+
+        //Object is hit on the left side
+        if(hitLeft) { allowKey.left = false; }
+
+        //Object is hit on the top
+        if(hitTop) { allowKey.top = false; }
+    }
 }

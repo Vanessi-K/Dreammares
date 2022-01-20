@@ -47,9 +47,18 @@ let allowKey = {
     left: true
 }
 
+//Do not allow certain keys based on position
+function setBoundaries(position) {
+    if(position === -playerStartPositionX) allowKey.left = false;
+    else if(position === CONFIG.lastColumn * CONFIG.tileSize - playerStartWidthCenter  - player.width/2) allowKey.right = false;
+}
+
 function setPositionX(position) {
-    if(positionX < -playerStartPositionX) positionX = -playerStartPositionX;
-    else if(positionX > CONFIG.lastColumn * CONFIG.tileSize) positionX = CONFIG.lastColumn * CONFIG.tileSize;
+    if(positionX < -playerStartPositionX) {
+        positionX = -playerStartPositionX;
+        allowKey.left = false;
+    }
+    else if(positionX > CONFIG.lastColumn * CONFIG.tileSize - playerStartWidthCenter - player.width/2) positionX = CONFIG.lastColumn * CONFIG.tileSize - playerStartWidthCenter - player.width/2;
     else positionX = position;
 }
 
@@ -188,6 +197,9 @@ function render() {
         gameBorder.drawHitBox();
     });
 
+    //Set boundaries
+    setBoundaries(positionX);
+
     ctx.resetTransform();
 }
 
@@ -240,10 +252,6 @@ function createWorld() {
 function updateMovement(timePassedSinceLastRender) {
     let movementX;
     let movementY;
-
-    if(positionX === -playerStartPositionX) {
-        allowKey.left = false;
-    }
 
     //set directions x
     if((currentKeys["ArrowRight"] || currentKeys["KeyD"]) && allowKey.right ) {movementX = 1;}

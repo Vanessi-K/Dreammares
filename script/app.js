@@ -146,8 +146,11 @@ function update(timePassedSinceLastRender) {
                         checkCollisionDirection(player.getHitBox(), worldObject.getHitBox());
                     }
                     if(worldObject instanceof Collectable) {
-                        player.increasePower();
-                        removeObject(i, worldObjects[i].indexOf(worldObject));
+                        //remove jar if E is pressed
+                        if(currentKeys["KeyE"]) {
+                            player.increasePower();
+                            removeObject(i, worldObjects[i].indexOf(worldObject));
+                        }
                     }
                     if(worldObject instanceof Monster) {
                         player.decreaseHealth();

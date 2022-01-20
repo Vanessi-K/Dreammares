@@ -148,7 +148,7 @@ class Player extends GameObject {
     increasePower() {
         this.power++;
         let powerPoint = document.querySelector("#power-point-" + this.power);
-        powerPoint.style.opacity = "1";
+        if(powerPoint !== null) powerPoint.style.opacity = "1";
     }
 
     gravity() {

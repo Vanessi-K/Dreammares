@@ -6,6 +6,7 @@ class Player extends GameObject {
     direction = "right";
     health = 3;
     power = 0;
+    creationTime = 0;
     velocity;
     g = 0.13;
     sprites = {
@@ -60,6 +61,8 @@ class Player extends GameObject {
 
         this.velocity = velocity;
 
+        this.creationTime = performance.now();
+
         Object.values(this.sprites).forEach((sprite) => {
             sprite.direction.right.image = new Image();
             sprite.direction.right.image.src = sprite.direction.right.src;
@@ -80,7 +83,7 @@ class Player extends GameObject {
 
         //If the player can still go down or the player moves up (calculate y-position)
         if(moving.goDown || moving.y === -1) {
-            this.setY(this.y + timePassedSincelastRender * moving.y * this.velocity + (this.g * timePassedSincelastRender^2 /2));
+            this.setY(this.y + timePassedSincelastRender * moving.y * this.velocity + this.gravity(timePassedSincelastRender));
         }
 
         this.setX(this.x + timePassedSincelastRender * moving.x * this.velocity);
@@ -141,7 +144,7 @@ class Player extends GameObject {
         this.health--;
 
         if(this.health === 0) {
-            this.died();
+            this.end()
         }
     }
 
@@ -151,12 +154,16 @@ class Player extends GameObject {
         if(powerPoint !== null) powerPoint.style.opacity = "1";
     }
 
-    gravity() {
-
+    gravity(t) {
+        return (this.g * t^2 /2);
     }
 
-    died() {
+    end() {
+        localStorage.setItem("health", this.health.toString());
+        localStorage.setItem("power", this.power.toString());
+        localStorage.setItem("time", (performance.now() - this.creationTime).toString());
 
+        window.location = "../../html/end.html";
     }
 }
 

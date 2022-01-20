@@ -3,17 +3,17 @@ import GameObject from "./GameObject.js";
 class Portal extends GameObject {
 
     image = new Image();
+    onHit;
 
-    constructor(ctx, x, y, imagePath, onHit) {
-        super(ctx, x, y, 0, 0);
+    constructor(ctx, x, y, width, height, imagePath, hitFunction = function () {}) {
+        super(ctx, x, y, width, height);
         this.image.src = imagePath;
-        this.width = this.image.width;
-        this.height = this.image.height;
+        this.onHit = hitFunction;
     }
 
     render() {
         this.ctx.translate(this.x, this.y);
-        this.ctx.drawImage(this.image, 0, 0, this.image.width, this.image.height)
+        this.ctx.drawImage(this.image, 0, 0, this.width, this.height)
         this.ctx.resetTransform();
     }
 
@@ -29,7 +29,6 @@ class Portal extends GameObject {
 
         return hitBox;
     }
-
 }
 
 export default Portal;

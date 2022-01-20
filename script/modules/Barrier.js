@@ -4,16 +4,14 @@ class Barrier extends GameObject {
 
     image = new Image();
 
-    constructor(ctx, x, y, imagePath) {
-        super(ctx, x, y, 0, 0);
+    constructor(ctx, x, y, width, height, imagePath) {
+        super(ctx, x, y, width, height);
         this.image.src = imagePath;
-        this.width = this.image.width;
-        this.height = this.image.height;
     }
 
     render() {
         this.ctx.translate(this.x, this.y);
-        this.ctx.drawImage(this.image, 0, 0, this.image.width, this.image.height)
+        this.ctx.drawImage(this.image, 0, 0, this.width, this.height)
         this.ctx.resetTransform();
     }
 

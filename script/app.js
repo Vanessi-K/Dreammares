@@ -157,7 +157,7 @@ function update(timePassedSinceLastRender) {
                         removeObject(i, worldObjects[i].indexOf(worldObject));
                     }
                     if(worldObject instanceof Portal) {
-                        console.log("Portal");
+                        worldObject.onHit();
                     }
                 }
             }
@@ -224,23 +224,23 @@ function createWorld() {
 
             switch (objectMatrixRowItem) {
                 case 1:
-                    newObject = new Barrier(ctx, x, y, "../../assets/barrier-horizontal.png"); break;
+                    newObject = new Barrier(ctx, x, y, 31, 31, "../../assets/barrier-horizontal.png"); break;
                 case 2:
-                    newObject = new Barrier(ctx, x, y, "../../assets/barrier-vertical.png"); break;
+                    newObject = new Barrier(ctx, x, y, 31, 31, "../../assets/barrier-vertical.png"); break;
                 case 3:
-                    newObject = new Barrier(ctx, x, y, "../../assets/barrier-corner.png"); break;
+                    newObject = new Barrier(ctx, x, y, 31, 31, "../../assets/barrier-corner.png"); break;
                 case 4:
-                    newObject = new Monster(ctx, x, y, "../../assets/shadow-creature.png"); break;
+                    newObject = new Monster(ctx, x, y, 177, 177, "../../assets/shadow-creature.png"); break;
                 case 5:
-                    newObject = new Collectable(ctx, x, y, "../../assets/empty-jar.png"); break;
+                    newObject = new Collectable(ctx, x, y, 161, 156, "../../assets/empty-jar.png"); break;
                 case 6:
-                    newObject = new Collectable(ctx, x, y, "../../assets/half-jar.png"); break;
+                    newObject = new Collectable(ctx, x, y, 161, 156, "../../assets/half-jar.png"); break;
                 case 7:
-                    newObject = new Collectable(ctx, x, y, "../../assets/full-jar.png"); break;
+                    newObject = new Collectable(ctx, x, y, 161, 156, "../../assets/full-jar.png"); break;
                 case 8:
-                    newObject = new Portal(ctx, x, y, "../../assets/portal.png"); break;
+                    newObject = new Portal(ctx, x, y, 171, 321, "../../assets/portal.png"); break;
                 case 9:
-                    newObject = new Portal(ctx, x, y, "../../assets/portal.png"); break;
+                    newObject = new Portal(ctx, x, y, 171, 321, "../../assets/portal.png", endByCompletion); break;
             }
 
             worldObjects[indexColumn][indexRow] = newObject;
@@ -359,4 +359,8 @@ function checkCollisionDirection (playerHit, objectHit) {
 
 function removeObject(indexColumn, indexRow) {
     worldObjects[indexColumn][indexRow] = null;
+}
+
+function endByCompletion () {
+    player.end();
 }

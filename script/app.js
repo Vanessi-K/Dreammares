@@ -5,6 +5,7 @@ import Boundary from "./modules/Boundary.js";
 import Portal from "./modules/Portal.js";
 import worldMatrix from "./modules/worldMatrix.js";
 import Player from "./modules/Player.js";
+import Bixi from "./modules/Bixi.js";
 
 const CONFIG = {
     width: 1920,
@@ -24,7 +25,9 @@ let camera = {
     lastRenderedColumn: CONFIG.columnsPerWidth + CONFIG.columnOffset
 };
 
+let gameRunning = true;
 let ctx;
+let bixi;
 let lastTickTimestamp;
 let player;
 let worldObjects = new Array(worldMatrix.length);
@@ -106,6 +109,8 @@ function init() {
     gameBorders.push(new Boundary(ctx, -playerStartPositionX, 0, CONFIG.lastColumn * CONFIG.tileSize + 2 * playerStartPositionX, CONFIG.topOffset));
     gameBorders.push(new Boundary(ctx, -playerStartPositionX, CONFIG.height - CONFIG.bottomOffset, CONFIG.lastColumn * CONFIG.tileSize + 2 * playerStartPositionX, CONFIG.bottomOffset));
 
+    bixi = new Bixi(ctx, 30, 0, 160, 130);
+
     lastTickTimestamp = performance.now();
 
     gameLoop();
@@ -119,7 +124,7 @@ function gameLoop() {
 
     lastTickTimestamp = performance.now();
 
-    requestAnimationFrame(gameLoop);
+    if(gameRunning) requestAnimationFrame(gameLoop);
 }
 
 function update(timePassedSinceLastRender) {
@@ -132,6 +137,8 @@ function update(timePassedSinceLastRender) {
     for(let side in allowKey) {
         allowKey[side] = true;
     }
+
+    bixi.update();
 
     //If the world is moving not the character, calculate the first visible column
     setCamera(calcFirstVisibleColumn(positionX));
@@ -157,6 +164,7 @@ function update(timePassedSinceLastRender) {
                         removeObject(i, worldObjects[i].indexOf(worldObject));
                     }
                     if(worldObject instanceof Portal) {
+                        gameRunning = false;
                         worldObject.onHit();
                     }
                 }
@@ -198,6 +206,8 @@ function render() {
 
     //Set boundaries
     setBoundaries(positionX);
+
+    bixi.render();
 
     ctx.resetTransform();
 }

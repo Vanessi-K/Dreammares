@@ -34,16 +34,14 @@ class Collision {
 
         //Check if object is intersecting with the player on a corner, that means two expressions are true
         if(!((hitLeft && hitTop) || (hitTop && hitRight) || (hitRight && hitBottom) || (hitBottom && hitLeft))) {
-            if(hitRight) { return "right"; }
-            if(hitBottom) { return "bottom"; }
-            if(hitLeft) { return "left"; }
-            if(hitTop) { return "top"; }
+            if(hitRight) { CONFIG.allowKey.right = false; }
+            if(hitBottom) { CONFIG.allowKey.bottom = false; }
+            if(hitLeft) { CONFIG.allowKey.left = false; }
+            if(hitTop) { CONFIG.allowKey.top = false; }
         }
 
         return null;
     }
-
-
 }
 
 export default Collision;

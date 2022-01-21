@@ -7,7 +7,14 @@ const CONFIG = {
     columnsPerWidth: 64, //1920:30
     columnOffset: 6,
     lastColumn: 0,
-    velocity: 0.5
+    velocity: 0.5,
+    run: true,
+    allowKey: {
+        top: true,
+        right: true,
+        bottom: true,
+        left: true
+    }
 }
 
 export default CONFIG;

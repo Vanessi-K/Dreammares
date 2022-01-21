@@ -5,8 +5,8 @@ class Player extends GameObject {
 
     state = "idle";
     direction = "right";
-    health = 3;
-    power = 0;
+    health;
+    power;
     creationTime = 0;
     g = 0.13;
     sprites = {
@@ -60,6 +60,8 @@ class Player extends GameObject {
         super(ctx, x, y, width, height);
 
         this.creationTime = performance.now();
+        this.health = 3;
+        this.power = 0;
 
         Object.values(this.sprites).forEach((sprite) => {
             sprite.direction.right.image = new Image();
@@ -72,7 +74,7 @@ class Player extends GameObject {
 
     init() {}
 
-    update(timePassedSincelastRender, moving = {x: 0, y: 0, goDown: false}) {
+    update(timePassedSincelastRender, moving = {x: 0, y: 0}) {
         if (moving.x === 1) this.direction = "right";
         else if (moving.x === -1) this.direction = "left";
 
@@ -80,7 +82,7 @@ class Player extends GameObject {
         (moving.x !== 0 || moving.y !== 0) ? this.state = "movement" : this.state = "idle";
 
         //If the player can still go down or the player moves up (calculate y-position)
-        if(moving.goDown || moving.y === -1) {
+        if(CONFIG.allowKey.bottom || moving.y === -1) {
             this.setY(this.y + timePassedSincelastRender * moving.y * CONFIG.velocity + this.gravity(timePassedSincelastRender));
         }
 
@@ -157,11 +159,14 @@ class Player extends GameObject {
     }
 
     end() {
-        localStorage.setItem("health", this.health.toString());
-        localStorage.setItem("power", this.power.toString());
+
+        CONFIG.run = false;
+
+        localStorage.setItem("health", this.health);
+        localStorage.setItem("power", this.power);
         localStorage.setItem("time", (performance.now() - this.creationTime).toString());
 
-        window.location = "../../html/end.html";
+        window.location = "../html/end.html";
     }
 }
 

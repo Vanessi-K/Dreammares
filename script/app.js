@@ -69,6 +69,28 @@ function init() {
     canvas.setAttribute("width", CONFIG.width);
     canvas.setAttribute("height", CONFIG.height);
 
+    initListeners();
+
+    //Player
+    player = new Player(ctx, playerStartPositionX, 770, 160, 290);
+    playerStartWidthCenter = playerStartPositionX + player.width/2;
+    playerStopsMoving = CONFIG.width/2 - playerStartWidthCenter;
+
+    bixi = new Bixi(ctx, 30, 0, 160, 130);
+
+    // create level
+    level = new Level(ctx, worldMatrix, player.end);
+
+    //top and bottom boundary
+    gameBorders.push(new Boundary(ctx, -playerStartPositionX, 0, CONFIG.lastColumn * CONFIG.tileSize + 2 * playerStartPositionX, CONFIG.topOffset));
+    gameBorders.push(new Boundary(ctx, -playerStartPositionX, CONFIG.height - CONFIG.bottomOffset, CONFIG.lastColumn * CONFIG.tileSize + 2 * playerStartPositionX, CONFIG.bottomOffset));
+
+    lastTickTimestamp = performance.now();
+
+    gameLoop();
+}
+
+function initListeners() {
     //possibility to change to fullscreen
     window.addEventListener("keypress", e => {
         switch (e.code) {
@@ -80,7 +102,7 @@ function init() {
     //game relevant listeners
     document.addEventListener('keydown', (key) => {
         //check if game relevant keys are pressed an prevent default
-        if(key.code.substring(0,5) === "Arrow" || key.code === "Space" || key.code === "KeyR") {
+        if(key.code.substring(0,5) === "Arrow" || key.code === "KeyW" || key.code === "KeyA" || key.code === "KeyS" ||key.code === "KeyD" || key.code === "KeyE" || key.code === "KeyI" || key.code === "KeyO") {
             key.preventDefault();
         }
         currentKeys[key.code] = true;
@@ -89,24 +111,6 @@ function init() {
     document.addEventListener('keyup', (key) => {
         currentKeys[key.code] = false;
     });
-
-    // create level
-    level = new Level(ctx, worldMatrix, endByCompletion);
-
-    //Player
-    player = new Player(ctx, playerStartPositionX, 770, 160, 290);
-    playerStartWidthCenter = playerStartPositionX + player.width/2;
-    playerStopsMoving = CONFIG.width/2 - playerStartWidthCenter;
-
-    //top and bottom boundary
-    gameBorders.push(new Boundary(ctx, -playerStartPositionX, 0, CONFIG.lastColumn * CONFIG.tileSize + 2 * playerStartPositionX, CONFIG.topOffset));
-    gameBorders.push(new Boundary(ctx, -playerStartPositionX, CONFIG.height - CONFIG.bottomOffset, CONFIG.lastColumn * CONFIG.tileSize + 2 * playerStartPositionX, CONFIG.bottomOffset));
-
-    bixi = new Bixi(ctx, 30, 0, 160, 130);
-
-    lastTickTimestamp = performance.now();
-
-    gameLoop();
 }
 
 function gameLoop() {
@@ -157,7 +161,7 @@ function update(timePassedSinceLastRender) {
                     }
                     if(worldObject instanceof Monster) {
                         player.decreaseHealth();
-                        level.removeObject(i, worldObjects[i].indexOf(worldObject));
+                        level.removeObject(i, worldObject);
                     }
                     if(worldObject instanceof Portal) {
                         gameRunning = false;
@@ -188,7 +192,6 @@ function render() {
 
     moveCanvas(positionX);
     player.render();
-
 
     //draw new frame
     //only render elements in visible area
@@ -285,11 +288,6 @@ function setCamera(firstColumn) {
     };
 }
 
-
-
-function endByCompletion () {
-    player.end();
-}
 
 function disableKey(keyDirection) {
     //set key for direction to not be usable anymore

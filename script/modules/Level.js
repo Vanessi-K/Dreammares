@@ -34,23 +34,23 @@ class Level {
 
                 switch (objectMatrixRowItem) {
                     case 1:
-                        newObject = new Barrier(this.ctx, x, y, 31, 31, "../../assets/barrier-horizontal.png"); break;
+                        newObject = new Barrier(this.ctx, x, y, 31, 31, "../assets/barrier-horizontal.png"); break;
                     case 2:
-                        newObject = new Barrier(this.ctx, x, y, 31, 31, "../../assets/barrier-vertical.png"); break;
+                        newObject = new Barrier(this.ctx, x, y, 31, 31, "../assets/barrier-vertical.png"); break;
                     case 3:
-                        newObject = new Barrier(this.ctx, x, y, 31, 31, "../../assets/barrier-corner.png"); break;
+                        newObject = new Barrier(this.ctx, x, y, 31, 31, "../assets/barrier-corner.png"); break;
                     case 4:
-                        newObject = new Monster(this.ctx, x, y, 177, 177, "../../assets/shadow-creature.png"); break;
+                        newObject = new Monster(this.ctx, x, y, 177, 177, "../assets/shadow-creature.png"); break;
                     case 5:
-                        newObject = new Collectable(this.ctx, x, y, 161, 156, "../../assets/empty-jar.png"); break;
+                        newObject = new Collectable(this.ctx, x, y, 161, 156, "../assets/empty-jar.png"); break;
                     case 6:
-                        newObject = new Collectable(this.ctx, x, y, 161, 156, "../../assets/half-jar.png"); break;
+                        newObject = new Collectable(this.ctx, x, y, 161, 156, "../assets/half-jar.png"); break;
                     case 7:
-                        newObject = new Collectable(this.ctx, x, y, 161, 156, "../../assets/full-jar.png"); break;
+                        newObject = new Collectable(this.ctx, x, y, 161, 156, "../assets/full-jar.png"); break;
                     case 8:
-                        newObject = new Portal(this.ctx, x, y, 171, 321, "../../assets/portal.png"); break;
+                        newObject = new Portal(this.ctx, x, y, 171, 321, "../assets/portal.png"); break;
                     case 9:
-                        newObject = new Portal(this.ctx, x, y, 171, 321, "../../assets/portal.png", endFunction); break;
+                        newObject = new Portal(this.ctx, x, y, 171, 321, "../assets/portal.png", endFunction); break;
                 }
 
                 worldObjectsArray[indexColumn][indexRow] = newObject;

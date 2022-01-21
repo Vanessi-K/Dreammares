@@ -13,11 +13,11 @@ class Player extends GameObject {
         idle: {
             direction: {
                 right: {
-                    src: "../../assets/sprites/Flynn-Sprites_idle-right.png",
+                    src: "../assets/sprites/Flynn-Sprites_idle-right.png",
                     image: null
                 },
                 left: {
-                    src: "../../assets/sprites/Flynn-Sprites_idle-left.png",
+                    src: "../assets/sprites/Flynn-Sprites_idle-left.png",
                     image: null
                 }
             },
@@ -31,11 +31,11 @@ class Player extends GameObject {
         movement: {
             direction: {
                 right: {
-                    src: "../../assets/sprites/Flynn-Sprites_movement-right.png",
+                    src: "../assets/sprites/Flynn-Sprites_movement-right.png",
                     image: null
                 },
                 left: {
-                    src: "../../assets/sprites/Flynn-Sprites_movement-left.png",
+                    src: "../assets/sprites/Flynn-Sprites_movement-left.png",
                     image: null
                 }
             },

@@ -8,7 +8,7 @@ class Bixi extends GameObject {
 
     sprites = {
         flying: {
-            src: "../../assets/sprites/Bixi-Sprites_flying.png",
+            src: "../assets/sprites/Bixi-Sprites_flying.png",
             image: null,
             frames: 8,
             fps: 15,

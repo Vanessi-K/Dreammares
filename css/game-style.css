@@ -33,7 +33,12 @@ body {
     height: calc(100vh/36 * 3);
 }
 
+#bar-area > * {
+    height: 80%;
+}
+
 #controls-description {
+    height: 60vh;
     position: absolute;
     top: 10vh;
     visibility: hidden;

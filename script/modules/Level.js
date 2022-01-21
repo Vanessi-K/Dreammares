@@ -60,6 +60,14 @@ class Level {
         return worldObjectsArray;
     }
 
+    removeObject(indexColumn, worldObject) {
+        this.worldObjects[indexColumn][this.objectRowIndex(indexColumn, worldObject)] = null;
+    }
+
+    objectRowIndex(indexColumn, worldObject) {
+        return this.worldObjects[indexColumn].indexOf(worldObject)
+    }
+
     update() {
 
     }

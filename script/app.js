@@ -23,7 +23,6 @@ let ctx;
 let bixi;
 let lastTickTimestamp;
 let player;
-let worldObjects;
 let gameBorders = [];
 let currentKeys = [];
 let positionX = 0;
@@ -93,7 +92,6 @@ function init() {
 
     // create level
     level = new Level(ctx, worldMatrix, endByCompletion);
-    worldObjects = level.getLevel();
 
     //Player
     player = new Player(ctx, playerStartPositionX, 770, 160, 290);
@@ -140,7 +138,7 @@ function update(timePassedSinceLastRender) {
 
     //only update elements in visible area
     for(let i = camera.firstRenderedColumn; i <= camera.lastRenderedColumn; i++) {
-        worldObjects[i].forEach((worldObject) => {
+        level.getLevel()[i].forEach((worldObject) => {
             if(worldObject !== null) {
                 worldObject.update();
 
@@ -154,12 +152,12 @@ function update(timePassedSinceLastRender) {
                         //remove jar if E is pressed
                         if(currentKeys["KeyE"]) {
                             player.increasePower();
-                            removeObject(i, worldObjects[i].indexOf(worldObject));
+                            level.removeObject(i, worldObject);
                         }
                     }
                     if(worldObject instanceof Monster) {
                         player.decreaseHealth();
-                        removeObject(i, worldObjects[i].indexOf(worldObject));
+                        level.removeObject(i, worldObjects[i].indexOf(worldObject));
                     }
                     if(worldObject instanceof Portal) {
                         gameRunning = false;
@@ -195,7 +193,7 @@ function render() {
     //draw new frame
     //only render elements in visible area
     for(let i = camera.firstRenderedColumn; i <= camera.lastRenderedColumn; i++) {
-        worldObjects[i].forEach((worldObject) => {
+        level.getLevel()[i].forEach((worldObject) => {
             if(worldObject !== null) {
                 moveCanvas(positionX);
                 worldObject.render();
@@ -287,9 +285,7 @@ function setCamera(firstColumn) {
     };
 }
 
-function removeObject(indexColumn, indexRow) {
-    worldObjects[indexColumn][indexRow] = null;
-}
+
 
 function endByCompletion () {
     player.end();

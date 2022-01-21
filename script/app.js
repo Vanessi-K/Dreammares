@@ -3,20 +3,13 @@ import Monster from "./modules/Monster.js";
 import Barrier from "./modules/Barrier.js";
 import Boundary from "./modules/Boundary.js";
 import Portal from "./modules/Portal.js";
+import Level from "./modules/Level.js";
 import worldMatrix from "./modules/worldMatrix.js";
 import Player from "./modules/Player.js";
 import Bixi from "./modules/Bixi.js";
+import Collision from "./modules/Collision.js";
+import CONFIG from "./modules/CONFIG.js";
 
-const CONFIG = {
-    width: 1920,
-    height: 1080,
-    tileSize: 30,
-    topOffset: 90,
-    bottomOffset: 30,
-    columnsPerWidth: 64, //1920:30
-    columnOffset: 6,
-    lastColumn: 299
-}
 
 let camera = {
     firstVisibleColumn: 0,
@@ -30,11 +23,10 @@ let ctx;
 let bixi;
 let lastTickTimestamp;
 let player;
-let worldObjects = new Array(worldMatrix.length);
+let worldObjects;
 let gameBorders = [];
 let currentKeys = [];
 let positionX = 0;
-let velocity = 0.5;
 let playerStartPositionX = 200;
 let playerStartWidthCenter;
 let playerStopsMoving;
@@ -43,6 +35,7 @@ let playerMovement = {
     y: 0,
     goDown: true
 }
+let level;
 
 let allowKey = {
     top: true,
@@ -98,10 +91,12 @@ function init() {
         currentKeys[key.code] = false;
     });
 
-    createWorld();
+    // create level
+    level = new Level(ctx, worldMatrix, endByCompletion);
+    worldObjects = level.getLevel();
 
     //Player
-    player = new Player(ctx, playerStartPositionX, 770, 160, 290, velocity);
+    player = new Player(ctx, playerStartPositionX, 770, 160, 290);
     playerStartWidthCenter = playerStartPositionX + player.width/2;
     playerStopsMoving = CONFIG.width/2 - playerStartWidthCenter;
 
@@ -148,9 +143,12 @@ function update(timePassedSinceLastRender) {
         worldObjects[i].forEach((worldObject) => {
             if(worldObject !== null) {
                 worldObject.update();
-                if(checkCollisionBetween(player, worldObject)){
+
+                let collision = new Collision(player, worldObject);
+
+                if(collision.isColliding()){
                     if(worldObject instanceof Barrier) {
-                        checkCollisionDirection(player.getHitBox(), worldObject.getHitBox());
+                        disableKey(collision.getCollisionDirection());
                     }
                     if(worldObject instanceof Collectable) {
                         //remove jar if E is pressed
@@ -174,8 +172,9 @@ function update(timePassedSinceLastRender) {
 
     gameBorders.forEach((gameBorder) => {
         gameBorder.update();
-        if (checkCollisionBetween(player, gameBorder)) {
-            checkCollisionDirection(player.getHitBox(), gameBorder.getHitBox());
+        let collision = new Collision(player, gameBorder)
+        if (collision.isColliding()) {
+            disableKey(collision.getCollisionDirection());
         }
     });
 
@@ -189,7 +188,7 @@ function render() {
         gameBorder.render();
     });
 
-    moveWorld(positionX);
+    moveCanvas(positionX);
     player.render();
 
 
@@ -198,7 +197,7 @@ function render() {
     for(let i = camera.firstRenderedColumn; i <= camera.lastRenderedColumn; i++) {
         worldObjects[i].forEach((worldObject) => {
             if(worldObject !== null) {
-                moveWorld(positionX);
+                moveCanvas(positionX);
                 worldObject.render();
             }
         });
@@ -212,51 +211,6 @@ function render() {
     ctx.resetTransform();
 }
 
-//read numbers from array and change them into objects
-function createWorld() {
-    //1 horizontal barrier
-    //2 vertical barrier
-    //3 horizontal and vertical barrier
-    //4 shadow monster
-    //5 jar 2 (empty)
-    //6 jar 4 (half)
-    //7 jar 6 (full)
-    //8 portal
-    //9 end-portal
-
-    worldMatrix.forEach((objectMatrixColumn, indexColumn) => {
-        worldObjects[indexColumn] = new Array(objectMatrixColumn.length);
-
-        objectMatrixColumn.forEach((objectMatrixRowItem, indexRow) => {
-            let newObject = null;
-            let x = indexColumn * CONFIG.tileSize;
-            let y = indexRow * CONFIG.tileSize + CONFIG.topOffset;
-
-            switch (objectMatrixRowItem) {
-                case 1:
-                    newObject = new Barrier(ctx, x, y, 31, 31, "../../assets/barrier-horizontal.png"); break;
-                case 2:
-                    newObject = new Barrier(ctx, x, y, 31, 31, "../../assets/barrier-vertical.png"); break;
-                case 3:
-                    newObject = new Barrier(ctx, x, y, 31, 31, "../../assets/barrier-corner.png"); break;
-                case 4:
-                    newObject = new Monster(ctx, x, y, 177, 177, "../../assets/shadow-creature.png"); break;
-                case 5:
-                    newObject = new Collectable(ctx, x, y, 161, 156, "../../assets/empty-jar.png"); break;
-                case 6:
-                    newObject = new Collectable(ctx, x, y, 161, 156, "../../assets/half-jar.png"); break;
-                case 7:
-                    newObject = new Collectable(ctx, x, y, 161, 156, "../../assets/full-jar.png"); break;
-                case 8:
-                    newObject = new Portal(ctx, x, y, 171, 321, "../../assets/portal.png"); break;
-                case 9:
-                    newObject = new Portal(ctx, x, y, 171, 321, "../../assets/portal.png", endByCompletion); break;
-            }
-
-            worldObjects[indexColumn][indexRow] = newObject;
-        });
-    });
-}
 
 function updateMovement(timePassedSinceLastRender) {
     let movementX;
@@ -273,7 +227,7 @@ function updateMovement(timePassedSinceLastRender) {
     else {movementY = 0;}
 
     //movement of the map
-    setPositionX(positionX + timePassedSinceLastRender * movementX * velocity);
+    setPositionX(positionX + timePassedSinceLastRender * movementX * CONFIG.velocity);
 
     //set the movement for the player
     playerMovement = {
@@ -284,7 +238,7 @@ function updateMovement(timePassedSinceLastRender) {
 }
 
 //Move the canvas before to suggest movement
-function moveWorld(scrollPositionX) {
+function moveCanvas(scrollPositionX) {
     //Check if scrollPositionX is in the range where the screen is moved and not the character, if the character should be moved values are set to the boundaries
     scrollPositionX -= playerStopsMoving;
     ctx.translate(-Math.min((Math.max(0,scrollPositionX)),(CONFIG.lastColumn - CONFIG.columnsPerWidth) * CONFIG.tileSize), 0);
@@ -333,44 +287,15 @@ function setCamera(firstColumn) {
     };
 }
 
-function checkCollisionBetween (gameObjectA, gameObjectB) {
-    let hbA = gameObjectA.getHitBox();
-    let hbB = gameObjectB.getHitBox();
-
-    //return if objects hit each other or not
-    return hbA.x < hbB.x + hbB.w &&
-        hbA.x + hbA.w > hbB.x &&
-        hbA.y < hbB.y + hbB.h &&
-        hbA.y + hbA.h > hbB.y;
-}
-
-function checkCollisionDirection (playerHit, objectHit) {
-    //Make checks on which side the object is hit; highest distance an object can intersect is by the half of
-    let hitRight = Math.abs(playerHit.x - objectHit.x) <= playerHit.w && (playerHit.x - objectHit.x) < -(playerHit.w - objectHit.w);
-    let hitBottom = Math.abs(playerHit.y - objectHit.y) <= playerHit.h && (playerHit.y - objectHit.y) < -(playerHit.h - objectHit.h);
-    let hitLeft =  Math.abs(playerHit.x - objectHit.x) <= objectHit.w && (playerHit.x - objectHit.x) < CONFIG.tileSize/2;
-    let hitTop =  Math.abs(playerHit.y - objectHit.y) <= objectHit.h;
-
-    //Check if object is intersecting with the player on a corner, that means two expressions are true
-    if(!((hitLeft && hitTop) || (hitTop && hitRight) || (hitRight && hitBottom) || (hitBottom && hitLeft))) {
-        //Object is hit on the right side
-        if(hitRight) { allowKey.right = false; }
-
-        //Object is hit on the bottom
-        if(hitBottom) { allowKey.bottom = false; }
-
-        //Object is hit on the left side
-        if(hitLeft) { allowKey.left = false; }
-
-        //Object is hit on the top
-        if(hitTop) { allowKey.top = false; }
-    }
-}
-
 function removeObject(indexColumn, indexRow) {
     worldObjects[indexColumn][indexRow] = null;
 }
 
 function endByCompletion () {
     player.end();
+}
+
+function disableKey(keyDirection) {
+    //set key for direction to not be usable anymore
+    if(keyDirection !== null) allowKey[keyDirection] = false;
 }

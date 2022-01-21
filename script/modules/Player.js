@@ -1,4 +1,5 @@
 import GameObject from "./GameObject.js";
+import CONFIG from "./CONFIG.js";
 
 class Player extends GameObject {
 
@@ -7,7 +8,6 @@ class Player extends GameObject {
     health = 3;
     power = 0;
     creationTime = 0;
-    velocity;
     g = 0.13;
     sprites = {
         idle: {
@@ -56,10 +56,8 @@ class Player extends GameObject {
         this.x = x;
     }
 
-    constructor(ctx, x, y, width, height, velocity) {
+    constructor(ctx, x, y, width, height) {
         super(ctx, x, y, width, height);
-
-        this.velocity = velocity;
 
         this.creationTime = performance.now();
 
@@ -83,10 +81,10 @@ class Player extends GameObject {
 
         //If the player can still go down or the player moves up (calculate y-position)
         if(moving.goDown || moving.y === -1) {
-            this.setY(this.y + timePassedSincelastRender * moving.y * this.velocity + this.gravity(timePassedSincelastRender));
+            this.setY(this.y + timePassedSincelastRender * moving.y * CONFIG.velocity + this.gravity(timePassedSincelastRender));
         }
 
-        this.setX(this.x + timePassedSincelastRender * moving.x * this.velocity);
+        this.setX(this.x + timePassedSincelastRender * moving.x * CONFIG.velocity);
     }
 
     render() {

@@ -21,7 +21,7 @@ let camera;
 let playerMovement = {
     x: 0,
     y: 0,
-    goDown: true
+    clickUp: false
 }
 let level;
 
@@ -168,7 +168,11 @@ function updateMovement(timePassedSinceLastRender) {
     //set directions y
     if((currentKeys["ArrowUp"] || currentKeys["KeyW"]) && CONFIG.allowKey.top) {movementY = -1; }
     else if((currentKeys["ArrowDown"] || currentKeys["KeyS"])  && CONFIG.allowKey.bottom) {movementY = 1 ;}
-    else {movementY = 0;}
+    else {
+        movementY = 0;
+    }
+
+
 
     //movement of the map
     setPositionX(positionX + timePassedSinceLastRender * movementX * CONFIG.velocity);
@@ -177,7 +181,8 @@ function updateMovement(timePassedSinceLastRender) {
     //set the movement for the player
     playerMovement = {
         x: movementX,
-        y: movementY
+        y: movementY,
+        clickUp: ((currentKeys["ArrowUp"] || currentKeys["KeyW"]) && !CONFIG.allowKey.top)
     }
 }
 

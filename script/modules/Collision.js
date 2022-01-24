@@ -42,7 +42,7 @@ class Collision {
         //                                                      check if object is already fully inside the player
         let hitBottom = Math.abs(bottomDistance) <= objectAHit.h && (bottomDistance) < -(objectAHit.h - objectBHit.h) && (bottomDistance) < 0;
         let hitLeft =  Math.abs(leftDistance) <= objectBHit.w && (leftDistance) < CONFIG.tileSize && (leftDistance) > 0;
-        let hitTop =  Math.abs(topDistance) <= objectBHit.h && (topDistance) < CONFIG.tileSize && (topDistance) > 0;
+        let hitTop =  Math.abs(topDistance) <= objectBHit.h && (topDistance) < objectBHit.h && (topDistance) > 0;
 
         let twoDirections = ((hitLeft && hitTop) || (hitTop && hitRight) || (hitRight && hitBottom) || (hitBottom && hitLeft))
 

@@ -70,21 +70,26 @@ class Player extends GameObject {
 
     init() {}
 
-    update(timePassedSincelastRender, moving = {x: 0, y: 0}) {
+    update(timePassedSinceLastRender, moving = {x: 0, y: 0, clickUp: false}) {
         this.movement = moving;
 
         if (this.movement.x === 1) this.direction = "right";
         else if (this.movement.x === -1) this.direction = "left";
 
         //Change states
-        (this.movement.x !== 0 || this.movement.y !== 0) ? this.state = "movement" : this.state = "idle";
+        (this.movement.x !== 0 || this.movement.y !== 0 || moving.clickUp) ? this.state = "movement" : this.state = "idle";
 
-        //If the player can still go down or the player moves up (calculate y-position)
-        if(CONFIG.allowKey.bottom || this.movement.y === -1) {
-            this.setY(this.coordinates.y + timePassedSincelastRender * this.movement.y * CONFIG.velocity + this.gravity(timePassedSincelastRender));
+
+        if(moving.clickUp) {
+            //If you are at the top ynd can not go up further but still hold upwards do not add gravity
+            this.setY(this.coordinates.y + timePassedSinceLastRender * this.movement.y * CONFIG.velocity);
+        }
+        else if(CONFIG.allowKey.bottom || this.movement.y === -1) {
+            //If the player can still go down or the player moves up (calculate y-position)
+            this.setY(this.coordinates.y + timePassedSinceLastRender * this.movement.y * CONFIG.velocity + this.gravity(timePassedSinceLastRender));
         }
 
-        this.setX(this.coordinates.x + timePassedSincelastRender * this.movement.x * CONFIG.velocity);
+        this.setX(this.coordinates.x + timePassedSinceLastRender * this.movement.x * CONFIG.velocity);
     }
 
     render() {

@@ -15,7 +15,7 @@ class Level {
         this.ctx = ctx;
         this.player = player;
 
-        this.worldObjects = this.createLevel(worldMatrixNumbers, player.end)
+        this.worldObjects = this.createLevel(worldMatrixNumbers, () => {player.end()});
         CONFIG.lastColumn = this.worldObjects.length - 1;
     }
 

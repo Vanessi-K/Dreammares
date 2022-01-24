@@ -713,12 +713,6 @@
 	.st703{fill:url(#SVGID_00000178891906597905059360000000579766039469091242_);}
 	.st704{fill:url(#SVGID_00000146460703827585258820000001462826520507326121_);}
 </style>
-<g id="Colors">
-</g>
-<g id="main_screen">
-</g>
-<g id="start_screen">
-</g>
 <g id="end_screen">
 	<g>
 		
@@ -1053,7 +1047,5 @@ xvAAAAAASUVORK5CYII=" transform="matrix(1 0 0 1 -17.2334 -18.3713)">
 			</g>
 		</g>
 	</g>
-</g>
-<g id="assets">
 </g>
 </svg>

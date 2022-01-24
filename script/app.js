@@ -17,7 +17,7 @@ let positionX = 0;
 let playerStartPositionX = 200;
 let playerStartWidthCenter;
 let playerStopsMoving;
-let screen;
+let camera;
 let playerMovement = {
     x: 0,
     y: 0,
@@ -59,7 +59,7 @@ function init() {
     playerStartWidthCenter = playerStartPositionX + player.width/2;
     playerStopsMoving = CONFIG.width/2 - playerStartWidthCenter;
 
-    screen = new Camera(ctx, playerStopsMoving);
+    camera = new Camera(ctx, playerStopsMoving);
 
     bixi = new Bixi(ctx, 30, 0, 160, 130);
 
@@ -125,9 +125,9 @@ function update(timePassedSinceLastRender) {
     bixi.update();
 
     //If the world is moving not the character, calculate the first visible column
-    screen.setRenderingBoundaries();
+    camera.setRenderingBoundaries();
 
-    level.update(screen.getRenderingBoundaries().firstRenderedColumn, screen.getRenderingBoundaries().lastRenderedColumn, currentKeys["KeyE"])
+    level.update(camera.getRenderingBoundaries().firstRenderedColumn, camera.getRenderingBoundaries().lastRenderedColumn, currentKeys["KeyE"])
 
     gameBorders.forEach((gameBorder) => {
         gameBorder.update();
@@ -146,10 +146,12 @@ function render() {
         gameBorder.render();
     });
 
-    screen.moveCamera();
+    camera.moveCamera();
     player.render();
+    camera.moveCamera();
+    player.drawHitBox();
 
-    level.render(screen);
+    level.render(camera);
 
     bixi.render();
 
@@ -172,7 +174,7 @@ function updateMovement(timePassedSinceLastRender) {
 
     //movement of the map
     setPositionX(positionX + timePassedSinceLastRender * movementX * CONFIG.velocity);
-    screen.setMovementAmount(positionX);
+    camera.setMovementAmount(positionX);
 
     //set the movement for the player
     playerMovement = {

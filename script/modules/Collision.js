@@ -29,7 +29,7 @@ class Collision {
 
         let hitRight = Math.abs(objectAHit.x - objectBHit.x) <= objectAHit.w && (objectAHit.x - objectBHit.x) < -(objectAHit.w - objectBHit.w);
         let hitBottom = Math.abs(objectAHit.y - objectBHit.y) <= objectAHit.h && (objectAHit.y - objectBHit.y) < -(objectAHit.h - objectBHit.h);
-        let hitLeft =  Math.abs(objectAHit.x - objectBHit.x) <= objectBHit.w && (objectAHit.x - objectBHit.x) < CONFIG.tileSize/2;
+        let hitLeft =  Math.abs(objectAHit.x - objectBHit.x) <= objectBHit.w && Math.abs(objectAHit.x - objectBHit.x) < CONFIG.tileSize/2 && (objectAHit.x - objectBHit.x) > 0;
         let hitTop =  Math.abs(objectAHit.y - objectBHit.y) <= objectBHit.h;
 
         //Check if object is intersecting with the player on a corner, that means two expressions are true

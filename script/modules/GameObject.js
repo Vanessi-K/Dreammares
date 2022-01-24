@@ -1,16 +1,24 @@
+import Coordinates from "./Coordinates.js";
+
 class GameObject {
     ctx;
-    x;
-    y;
+    coordinates;
     width;
     height;
 
     constructor(ctx, x, y, width, height) {
         this.ctx = ctx;
-        this.x = x;
-        this.y = y;
+        this.coordinates = new Coordinates(x, y);
         this.width = width;
         this.height = height;
+    }
+
+    setY(y) {
+        this.coordinates.y = y;
+    }
+
+    setX(x) {
+        this.coordinates.x = x;
     }
 
     init() {}
@@ -23,8 +31,8 @@ class GameObject {
 
     getHitBox() {
         return {
-            x: this.x,
-            y: this.y,
+            x: this.coordinates.x,
+            y: this.coordinates.y,
             w: this.width,
             h: this.height
         }

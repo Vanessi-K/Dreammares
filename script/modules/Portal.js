@@ -12,7 +12,7 @@ class Portal extends GameObject {
     }
 
     render() {
-        this.ctx.translate(this.x, this.y);
+        this.ctx.translate(this.coordinates.x, this.coordinates.y);
         this.ctx.drawImage(this.image, 0, 0, this.width, this.height)
         this.ctx.resetTransform();
     }

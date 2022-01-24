@@ -12,20 +12,12 @@ class Boundary extends GameObject {
     }
 
     render() {
-        this.ctx.translate(this.x, this.y);
+        this.ctx.translate(this.coordinates.x, this.coordinates.y);
         this.ctx.fillStyle = "#18073a";
         this.ctx.fillRect(0, 0, this.width, this.height);
         this.ctx.resetTransform();
     }
 
-    getHitBox() {
-        return {
-            x: this.x,
-            y: this.y,
-            w: this.width,
-            h: this.height
-        }
-    }
 
     drawHitBox() {
         //debug bounding box

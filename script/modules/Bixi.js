@@ -29,7 +29,7 @@ class Bixi extends GameObject {
     }
 
     render() {
-        this.ctx.translate(this.x, this.y);
+        this.ctx.translate(this.coordinates.x, this.coordinates.y);
 
         //get correct values for the sprite in the current direction
         let coordinates = this.getImageSpriteCoordinates(this.sprites[this.state]);

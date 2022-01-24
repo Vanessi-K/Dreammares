@@ -48,14 +48,6 @@ class Player extends GameObject {
         }
     };
 
-    setY(y) {
-        this.y = y;
-    }
-
-    setX(x) {
-        this.x = x;
-    }
-
     constructor(ctx, x, y, width, height) {
         super(ctx, x, y, width, height);
 
@@ -83,14 +75,14 @@ class Player extends GameObject {
 
         //If the player can still go down or the player moves up (calculate y-position)
         if(CONFIG.allowKey.bottom || moving.y === -1) {
-            this.setY(this.y + timePassedSincelastRender * moving.y * CONFIG.velocity + this.gravity(timePassedSincelastRender));
+            this.setY(this.coordinates.y + timePassedSincelastRender * moving.y * CONFIG.velocity + this.gravity(timePassedSincelastRender));
         }
 
-        this.setX(this.x + timePassedSincelastRender * moving.x * CONFIG.velocity);
+        this.setX(this.coordinates.x + timePassedSincelastRender * moving.x * CONFIG.velocity);
     }
 
     render() {
-        this.ctx.translate(this.x, this.y);
+        this.ctx.translate(this.coordinates.x, this.coordinates.y);
 
         //get correct values for the sprite in the current direction
         let coordinates = this.getImageSpriteCoordinates(this.sprites[this.state]);

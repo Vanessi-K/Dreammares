@@ -105,8 +105,6 @@ class Level {
                 if(worldObject !== null) {
                     camera.moveCamera();
                     worldObject.render();
-                    camera.moveCamera();
-                    worldObject.drawHitBox();
                 }
             });
         }

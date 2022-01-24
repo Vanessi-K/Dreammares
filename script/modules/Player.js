@@ -47,6 +47,10 @@ class Player extends GameObject {
             }
         }
     };
+    movement = {
+        x: 0,
+        y: 0
+    }
 
     constructor(ctx, x, y, width, height) {
         super(ctx, x, y, width, height);
@@ -67,18 +71,20 @@ class Player extends GameObject {
     init() {}
 
     update(timePassedSincelastRender, moving = {x: 0, y: 0}) {
-        if (moving.x === 1) this.direction = "right";
-        else if (moving.x === -1) this.direction = "left";
+        this.movement = moving;
+
+        if (this.movement.x === 1) this.direction = "right";
+        else if (this.movement.x === -1) this.direction = "left";
 
         //Change states
-        (moving.x !== 0 || moving.y !== 0) ? this.state = "movement" : this.state = "idle";
+        (this.movement.x !== 0 || this.movement.y !== 0) ? this.state = "movement" : this.state = "idle";
 
         //If the player can still go down or the player moves up (calculate y-position)
-        if(CONFIG.allowKey.bottom || moving.y === -1) {
-            this.setY(this.coordinates.y + timePassedSincelastRender * moving.y * CONFIG.velocity + this.gravity(timePassedSincelastRender));
+        if(CONFIG.allowKey.bottom || this.movement.y === -1) {
+            this.setY(this.coordinates.y + timePassedSincelastRender * this.movement.y * CONFIG.velocity + this.gravity(timePassedSincelastRender));
         }
 
-        this.setX(this.coordinates.x + timePassedSincelastRender * moving.x * CONFIG.velocity);
+        this.setX(this.coordinates.x + timePassedSincelastRender * this.movement.x * CONFIG.velocity);
     }
 
     render() {

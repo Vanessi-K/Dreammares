@@ -148,8 +148,6 @@ function render() {
 
     camera.moveCamera();
     player.render();
-    camera.moveCamera();
-    player.drawHitBox();
 
     level.render(camera);
 

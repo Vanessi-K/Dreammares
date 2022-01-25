@@ -1,23 +1,20 @@
-import Boundary from "./modules/Boundary.js";
 import Level from "./modules/Level.js";
 import worldMatrix from "./modules/worldMatrix.js";
 import Player from "./modules/Player.js";
 import Bixi from "./modules/Bixi.js";
-import Collision from "./modules/Collision.js";
 import CONFIG from "./modules/CONFIG.js";
-import Camera from "./modules/Camera.js";
+import Borders from "./modules/Borders.js";
 
 let ctx;
 let bixi;
 let lastTickTimestamp;
 let player;
-let gameBorders = [];
+let borders;
 let currentKeys = [];
 let positionX = 0;
 let playerStartPositionX = 200;
 let playerStartWidthCenter;
 let playerStopsMoving;
-let camera;
 let playerMovement = {
     x: 0,
     y: 0,
@@ -55,20 +52,20 @@ function init() {
     initListeners();
 
     //Player
-    player = new Player(ctx, playerStartPositionX, 770, 160, 290);
-    playerStartWidthCenter = playerStartPositionX + player.width/2;
-    playerStopsMoving = CONFIG.width/2 - playerStartWidthCenter;
-
-    camera = new Camera(ctx, playerStopsMoving);
-
-    bixi = new Bixi(ctx, 30, 0, 160, 130);
+    player = new Player(ctx, 200, 770, 160, 290);
 
     // create level
     level = new Level(ctx, worldMatrix, player);
 
+    playerStartWidthCenter = player.coordinates.x + player.width/2;
+    playerStopsMoving = CONFIG.width/2 - playerStartWidthCenter;
+
+    bixi = new Bixi(ctx, 30, 0, 160, 130);
+
+
+
     //top and bottom boundary
-    gameBorders.push(new Boundary(ctx, -playerStartPositionX, 0, CONFIG.lastColumn * CONFIG.tileSize + 2 * playerStartPositionX, CONFIG.topOffset));
-    gameBorders.push(new Boundary(ctx, -playerStartPositionX, CONFIG.height - CONFIG.bottomOffset, CONFIG.lastColumn * CONFIG.tileSize + 2 * playerStartPositionX, CONFIG.bottomOffset));
+    borders = new Borders(ctx);
 
     lastTickTimestamp = performance.now();
 
@@ -124,32 +121,23 @@ function update(timePassedSinceLastRender) {
 
     bixi.update();
 
-    //If the world is moving not the character, calculate the first visible column
-    camera.setRenderingBoundaries();
+    borders.update(player);
 
-    level.update(camera.getRenderingBoundaries().firstRenderedColumn, camera.getRenderingBoundaries().lastRenderedColumn, currentKeys["KeyE"])
+    level.update(currentKeys["KeyE"])
 
-    gameBorders.forEach((gameBorder) => {
-        gameBorder.update();
-        let collision = new Collision(player, gameBorder)
-        if (collision.isColliding()) {
-            collision.getCollisionDirection();
-        }
-    });
+
 }
 
 function render() {
     //delete the canvas
     ctx.clearRect(0, 0, CONFIG.width, CONFIG.height);
 
-    gameBorders.forEach((gameBorder) => {
-        gameBorder.render();
-    });
+    borders.render();
 
-    camera.moveCamera();
+    level.camera.moveCamera();
     player.render();
 
-    level.render(camera);
+    level.render();
 
     bixi.render();
 
@@ -174,7 +162,7 @@ function updateMovement(timePassedSinceLastRender) {
 
     //movement of the map
     setPositionX(positionX + timePassedSinceLastRender * movementX * CONFIG.velocity);
-    camera.setMovementAmount(positionX);
+    level.camera.setMovementAmount(positionX);
 
     //set the movement for the player
     playerMovement = {

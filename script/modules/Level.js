@@ -4,12 +4,14 @@ import Barrier from "./Barrier.js";
 import Portal from "./Portal.js";
 import CONFIG from "./CONFIG.js";
 import Collision from "./Collision.js";
+import Camera from "./Camera.js";
 
 class Level {
 
     ctx;
     worldObjects;
     player;
+    camera
 
     constructor(ctx, worldMatrixNumbers, player) {
         this.ctx = ctx;
@@ -17,6 +19,11 @@ class Level {
 
         this.worldObjects = this.createLevel(worldMatrixNumbers, () => {player.end()});
         CONFIG.lastColumn = this.worldObjects.length - 1;
+
+        this.playerStartWidthCenter = player.coordinates.x+ player.width/2;
+        this.playerStopsMoving = CONFIG.width/2 - this.playerStartWidthCenter;
+
+        this.camera = new Camera(ctx, this.playerStopsMoving);
     }
 
     createLevel(worldMatrixNumbers, endFunction) {
@@ -66,7 +73,13 @@ class Level {
         return this.worldObjects[indexColumn].indexOf(worldObject)
     }
 
-    update(start, end, ePressed) {
+    update( ePressed) {
+        //If the world is moving not the character, calculate the first visible column
+        this.camera.setRenderingBoundaries();
+
+        let start = this.camera.getRenderingBoundaries().firstRenderedColumn;
+        let end = this.camera.getRenderingBoundaries().lastRenderedColumn;
+
         //only update elements in visible area
         for(let i = start; i <= end; i++) {
             this.worldObjects[i].forEach((worldObject) => {
@@ -99,11 +112,14 @@ class Level {
         }
     }
 
-    render(camera) {
-        for(let i = camera.getRenderingBoundaries().firstRenderedColumn; i <= camera.getRenderingBoundaries().lastRenderedColumn; i++) {
+    render() {
+        let start = this.camera.getRenderingBoundaries().firstRenderedColumn;
+        let end = this.camera.getRenderingBoundaries().lastRenderedColumn;
+
+        for(let i = start; i <= end; i++) {
             this.worldObjects[i].forEach((worldObject) => {
                 if(worldObject !== null) {
-                    camera.moveCamera();
+                    this.camera.moveCamera();
                     worldObject.render();
                 }
             });

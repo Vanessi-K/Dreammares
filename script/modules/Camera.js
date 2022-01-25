@@ -8,7 +8,7 @@ class Camera {
     renderingBoundaries;
 
     setMovementAmount(movement) {
-       this.movementAmount = movement - this.playerStopsMoving;
+       this.movementAmount = movement;
     }
 
     getRenderingBoundaries() {
@@ -22,13 +22,15 @@ class Camera {
 
     //Move the canvas before to suggest movement
     moveCamera() {
+        let move = this.movementAmount - this.playerStopsMoving;
         //Check if scrollPositionX is in the range where the screen is moved and not the character, if the character should be moved values are set to the boundaries
-        this.ctx.translate(-Math.min((Math.max(0,this.movementAmount)),(CONFIG.lastColumn - CONFIG.columnsPerWidth) * CONFIG.tileSize), 0);
+        this.ctx.translate(-Math.min((Math.max(0,move)),(CONFIG.lastColumn - CONFIG.columnsPerWidth) * CONFIG.tileSize), 0);
     }
 
     calculateFirstVisibleColumn() {
+        let move = this.movementAmount - this.playerStopsMoving;
         //Check if scrollPositionX is in the range where the screen is moved and not the character, if the character should be moved values are set to the boundaries and then calculated
-        return Math.floor(Math.min((Math.max(0,this.movementAmount)),(CONFIG.lastColumn - CONFIG.columnsPerWidth) * CONFIG.tileSize) / CONFIG.tileSize);
+        return Math.floor(Math.min((Math.max(0,move)),(CONFIG.lastColumn - CONFIG.columnsPerWidth) * CONFIG.tileSize) / CONFIG.tileSize);
     }
 
     setRenderingBoundaries() {

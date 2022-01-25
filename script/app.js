@@ -1,5 +1,5 @@
 import Level from "./modules/Level.js";
-import worldMatrix from "./modules/worldMatrix.js";
+import world from "./modules/world.js";
 import Player from "./modules/Player.js";
 import Bixi from "./modules/Bixi.js";
 import CONFIG from "./modules/CONFIG.js";
@@ -11,10 +11,6 @@ let lastTickTimestamp;
 let player;
 let borders;
 let currentKeys = [];
-let positionX = 0;
-let playerStartPositionX = 200;
-let playerStartWidthCenter;
-let playerStopsMoving;
 let playerMovement = {
     x: 0,
     y: 0,
@@ -22,21 +18,6 @@ let playerMovement = {
 }
 let level;
 
-//Do not allow certain keys based on position
-function setBoundaries(position) {
-    if(position <= -playerStartPositionX) CONFIG.allowKey.left = false;
-    else if(position >= CONFIG.lastColumn * CONFIG.tileSize - playerStartWidthCenter  - player.width/2) CONFIG.allowKey.right = false;
-}
-
-function setPositionX(position) {
-    if(position < -playerStartPositionX) {
-        positionX = -playerStartPositionX;
-    }
-    else if(position > CONFIG.lastColumn * CONFIG.tileSize - playerStartWidthCenter - player.width/2) {
-        positionX = CONFIG.lastColumn * CONFIG.tileSize - playerStartWidthCenter - player.width / 2;
-    }
-    else positionX = position;
-}
 
 window.onload = () => {
     init();
@@ -52,17 +33,12 @@ function init() {
     initListeners();
 
     //Player
-    player = new Player(ctx, 200, 770, 160, 290);
+    player = new Player(ctx, world.x, world.y, 160, 290);
 
     // create level
-    level = new Level(ctx, worldMatrix, player);
-
-    playerStartWidthCenter = player.coordinates.x + player.width/2;
-    playerStopsMoving = CONFIG.width/2 - playerStartWidthCenter;
+    level = new Level(ctx, world.worldMatrix, player);
 
     bixi = new Bixi(ctx, 30, 0, 160, 130);
-
-
 
     //top and bottom boundary
     borders = new Borders(ctx);
@@ -108,7 +84,7 @@ function gameLoop() {
 
 function update(timePassedSinceLastRender) {
 
-    setBoundaries(positionX);
+    level.setBoundaries();
 
     updateMovement(timePassedSinceLastRender);
 
@@ -124,8 +100,6 @@ function update(timePassedSinceLastRender) {
     borders.update(player);
 
     level.update(currentKeys["KeyE"])
-
-
 }
 
 function render() {
@@ -161,10 +135,9 @@ function updateMovement(timePassedSinceLastRender) {
     }
 
     //movement of the map
-    setPositionX(positionX + timePassedSinceLastRender * movementX * CONFIG.velocity);
-    level.camera.setMovementAmount(positionX);
+    level.addPositionX(timePassedSinceLastRender * movementX * CONFIG.velocity);
 
-    //set the movement for the player
+    //set the movement variables for the player
     playerMovement = {
         x: movementX,
         y: movementY,

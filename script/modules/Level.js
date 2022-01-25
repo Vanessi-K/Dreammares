@@ -11,7 +11,8 @@ class Level {
     ctx;
     worldObjects;
     player;
-    camera
+    camera;
+    playerStartPositionX;
 
     constructor(ctx, worldMatrixNumbers, player) {
         this.ctx = ctx;
@@ -19,11 +20,32 @@ class Level {
 
         this.worldObjects = this.createLevel(worldMatrixNumbers, () => {player.end()});
         CONFIG.lastColumn = this.worldObjects.length - 1;
+        this.playerStartPositionX = player.coordinates.x;
 
-        this.playerStartWidthCenter = player.coordinates.x+ player.width/2;
-        this.playerStopsMoving = CONFIG.width/2 - this.playerStartWidthCenter;
+        this.camera = new Camera(ctx, CONFIG.width/2 - (player.coordinates.x + player.width/2));
+    }
 
-        this.camera = new Camera(ctx, this.playerStopsMoving);
+    //Do not allow certain keys based on position (right and left borders)
+     setBoundaries() {
+        let position = this.camera.movementAmount;
+
+        if(position <= -this.playerStartPositionX) CONFIG.allowKey.left = false; //leftBorder
+        else if(position >= CONFIG.lastColumn * CONFIG.tileSize -(this.playerStartPositionX + this.player.width/2) - this.player.width/2) CONFIG.allowKey.right = false; //rightBorder
+    }
+
+    addPositionX(position) {
+        let positionX = this.camera.movementAmount;
+
+        if(position < -this.playerStartPositionX) {
+            positionX += -this.playerStartPositionX;
+        }
+        else if(position > CONFIG.lastColumn * CONFIG.tileSize - (this.playerStartPositionX + this.player.width/2) - this.player.width/2) {
+            positionX += CONFIG.lastColumn * CONFIG.tileSize - (this.playerStartPositionX + this.player.width/2) - this.player.width/2;
+        }
+        else positionX += position;
+
+        //set the movement of the camera
+        this.camera.setMovementAmount(positionX);
     }
 
     createLevel(worldMatrixNumbers, endFunction) {

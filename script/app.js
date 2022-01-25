@@ -172,8 +172,6 @@ function updateMovement(timePassedSinceLastRender) {
         movementY = 0;
     }
 
-
-
     //movement of the map
     setPositionX(positionX + timePassedSinceLastRender * movementX * CONFIG.velocity);
     camera.setMovementAmount(positionX);

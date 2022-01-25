@@ -33,10 +33,10 @@ function init() {
     initListeners();
 
     //Player
-    player = new Player(ctx, world.x, world.y, 160, 290);
+    player = new Player(ctx, world[1].x, world[1].y, 160, 290);
 
     // create level
-    level = new Level(ctx, world.worldMatrix, player);
+    level = new Level(ctx, world[1].worldMatrix, player);
 
     bixi = new Bixi(ctx, 30, 0, 160, 130);
 

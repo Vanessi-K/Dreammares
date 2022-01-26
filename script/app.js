@@ -24,6 +24,8 @@ window.onload = () => {
 }
 
 function init() {
+    let worldNumber = randomNumberBetween(1, 3);
+
     let canvas = document.querySelector("#game-area");
     ctx = canvas.getContext("2d");
 
@@ -33,10 +35,10 @@ function init() {
     initListeners();
 
     //Player
-    player = new Player(ctx, world[1].x, world[1].y, 160, 290);
+    player = new Player(ctx, world[worldNumber].x, world[worldNumber].y, 160, 290);
 
     // create level
-    level = new Level(ctx, world[1].worldMatrix, player);
+    level = new Level(ctx, world[worldNumber].worldMatrix, player);
 
     bixi = new Bixi(ctx, 30, 0, 160, 130);
 
@@ -143,5 +145,9 @@ function updateMovement(timePassedSinceLastRender) {
         y: movementY,
         clickUp: ((currentKeys["ArrowUp"] || currentKeys["KeyW"]) && !CONFIG.allowKey.top)
     }
+}
+
+function randomNumberBetween(min, max) { // min and max included
+    return Math.floor(Math.random() * (max - min + 1) + min)
 }
 

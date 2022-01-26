@@ -127,6 +127,7 @@ p, ul {
     background: linear-gradient(180deg, rgba(130,55,170,1) 0%, rgba(39,4,94,1) 100%);
     padding: 1vh 2vw;
     border-radius: 3vh;
+    height: 5vh;
     box-shadow: 21px 21px 26px black;
     transition: 0.5s;
     color: #dddd28;
@@ -134,7 +135,8 @@ p, ul {
 }
 
 .button:hover {
-    font-size: 3.8vh;
+    font-size: 4vh;
+    height: 6vh;
 }
 
 .image-height {

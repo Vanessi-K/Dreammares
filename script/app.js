@@ -24,7 +24,7 @@ window.onload = () => {
 }
 
 function init() {
-    let worldNumber = randomNumberBetween(1, 3);
+    let worldNumber = randomNumberBetween(1, 10);
 
     let canvas = document.querySelector("#game-area");
     ctx = canvas.getContext("2d");
